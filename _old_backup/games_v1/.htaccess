@@ -1,0 +1,49 @@
+# ==================================================================
+# ASVIORA GAMES - Apache configuration
+# ==================================================================
+
+Options -Indexes
+DirectoryIndex index.php index.html
+
+# ---------- friendly error pages ----------
+ErrorDocument 404 /games/404.php
+
+# ---------- security headers ----------
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+# ---------- block access to sensitive files ----------
+<FilesMatch "(^\.|\.(sql|md|log|ini|bak|old|dist)$)">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# ---------- compression ----------
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml \
+    application/javascript application/json image/svg+xml
+</IfModule>
+
+# ---------- caching for static assets ----------
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css                "access plus 7 days"
+  ExpiresByType application/javascript  "access plus 7 days"
+  ExpiresByType image/jpeg              "access plus 30 days"
+  ExpiresByType image/png               "access plus 30 days"
+  ExpiresByType image/webp              "access plus 30 days"
+  ExpiresByType image/svg+xml           "access plus 30 days"
+  ExpiresByType font/woff2              "access plus 1 year"
+</IfModule>
+
+# ---------- UTF-8 ----------
+AddDefaultCharset UTF-8

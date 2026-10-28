@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Sudoku | Asviora Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/game.css">
+<style>
+  .sud-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 12px; height: 100%; width: 100%; justify-content: center;
+  }
+
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    background: var(--line);
+    gap: 1px;
+    border: 2px solid #38455a;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 18px 46px -20px rgba(0,0,0,.9);
+    width: min(100%, 480px);
+    aspect-ratio: 1 / 1;
+    touch-action: manipulation;
+  }
+
+  .cell {
+    position: relative;
+    display: grid; place-items: center;
+    background: #151b23;
+    border: 0; padding: 0; margin: 0;
+    font: 800 clamp(.9rem, 3.6vmin, 1.35rem)/1 "Plus Jakarta Sans", sans-serif;
+    color: var(--green);
+    cursor: pointer;
+    transition: background .14s var(--ease), color .14s var(--ease);
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* 3x3 box separators */
+  .cell.bx-r { box-shadow: inset -2px 0 0 #38455a; }
+  .cell.bx-b { box-shadow: inset 0 -2px 0 #38455a; }
+  .cell.bx-r.bx-b { box-shadow: inset -2px 0 0 #38455a, inset 0 -2px 0 #38455a; }
+
+  .cell.given { color: #dbe4ef; background: #1b222c; cursor: default; }
+  .cell.peer  { background: #1b232e; }
+  .cell.same  { background: rgba(229,184,75,.14); color: var(--gold); }
+  .cell.sel   { background: rgba(164,217,76,.2); box-shadow: inset 0 0 0 2px var(--green); }
+  .cell.sel.bx-r, .cell.sel.bx-b, .cell.sel.bx-r.bx-b { box-shadow: inset 0 0 0 2px var(--green); }
+  .cell.bad   { color: var(--danger) !important; background: rgba(242,99,126,.15); }
+  .cell.hinted { animation: hintFlash .9s var(--ease) 2; }
+  @keyframes hintFlash {
+    0%,100% { background: #151b23 }
+    50% { background: rgba(86,176,240,.3) }
+  }
+  .cell.done { animation: cellPop .3s var(--ease); }
+  @keyframes cellPop { 0%{transform:scale(.6);opacity:.4} 100%{transform:scale(1);opacity:1} }
+
+  .notes {
+    position: absolute; inset: 2px;
+    display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+    font: 700 clamp(.38rem, 1.35vmin, .56rem)/1 "Plus Jakarta Sans", sans-serif;
+    color: #7d8ea3; pointer-events: none;
+  }
+  .notes span { display: grid; place-items: center; }
+
+  /* number pad */
+  #pad { display: grid; grid-template-columns: repeat(9, 1fr); gap: 5px; width: min(100%, 480px); }
+  .num {
+    aspect-ratio: 1 / 1.15;
+    display: grid; place-items: center;
+    font: 900 clamp(.9rem, 3.4vmin, 1.2rem)/1 "Plus Jakarta Sans", sans-serif;
+    background: var(--surface); color: var(--text);
+    border: 1px solid var(--line); border-radius: 10px;
+    cursor: pointer; transition: all .16s var(--ease);
+    position: relative;
+  }
+  .num:hover { border-color: var(--green); color: var(--green); }
+  .num:active { transform: scale(.9); }
+  .num.spent { opacity: .3; }
+  .num .left {
+    position: absolute; bottom: 2px; right: 4px;
+    font: 700 .5rem/1 "Plus Jakarta Sans", sans-serif; color: var(--dim);
+  }
+
+  #actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+
+  @media (max-width: 720px) {
+    .sud-wrap { gap: 8px; }
+    #grid { width: min(100%, 92vmin); }
+    #pad { gap: 4px; }
+    .num { border-radius: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="g-shell">
+
+  <div class="g-bar">
+    <div class="g-stat"><span class="s-l">Time</span><span class="s-v" id="uiTime">00:00</span></div>
+    <div class="g-sep"></div>
+    <div class="g-stat hi"><span class="s-l">Filled</span><span class="s-v" id="uiFilled">0/81</span></div>
+    <div class="g-sep"></div>
+    <div class="g-stat"><span class="s-l">Mistakes</span><span class="s-v" id="uiErr">0/3</span></div>
+    <div class="g-sep"></div>
+    <div class="g-stat gold"><span class="s-l">Hints</span><span class="s-v" id="uiHints">3</span></div>
+
+    <span class="g-spacer"></span>
+
+    <select class="g-select" id="selDiff" title="Difficulty">
+      <option value="easy">Easy</option>
+      <option value="medium" selected>Medium</option>
+      <option value="hard">Hard</option>
+      <option value="expert">Expert</option>
+    </select>
+    <button class="gb primary" id="btnNew">&#8635; New Puzzle</button>
+  </div>
+
+  <div class="g-stage">
+    <div class="sud-wrap">
+      <div id="grid"></div>
+      <div id="pad"></div>
+      <div id="actions">
+        <button class="gb sm" id="btnNotes">&#9999;&#65039; Notes: Off</button>
+        <button class="gb sm" id="btnErase">&#9003; Erase</button>
+        <button class="gb sm" id="btnHint">&#128161; Hint</button>
+        <button class="gb sm" id="btnCheck">&#10003; Check</button>
+      </div>
+      <div class="g-hint" id="hintLine">
+        Tap a cell, then a number. Keyboard 1&ndash;9 works too &mdash; Backspace erases, N toggles notes.
+      </div>
+    </div>
+
+    <div class="g-modal" id="modal">
+      <div class="g-modal-box">
+        <div class="m-ico" id="mIco">&#127881;</div>
+        <h2 id="mTitle">Puzzle Solved!</h2>
+        <p id="mText">Clean logic. Speed and accuracy both count.</p>
+        <div class="g-modal-score" id="mScore">0</div>
+        <div class="g-modal-sub">Points earned</div>
+        <div class="g-modal-rows">
+          <div class="r"><span class="k">Difficulty</span><span class="v" id="mDiff">Medium</span></div>
+          <div class="r"><span class="k">Time taken</span><span class="v" id="mTime">00:00</span></div>
+          <div class="r"><span class="k">Mistakes</span><span class="v" id="mErr">0</span></div>
+          <div class="r"><span class="k">Hints used</span><span class="v" id="mHints">0</span></div>
+        </div>
+        <div class="g-modal-actions">
+          <button class="gb primary" id="mAgain">New Puzzle</button>
+          <button class="gb" id="mClose">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="../../assets/js/game-sdk.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var DIFF = {
+    easy:   { holes: 38, base: 400,  label: 'Easy'   },
+    medium: { holes: 46, base: 650,  label: 'Medium' },
+    hard:   { holes: 52, base: 950,  label: 'Hard'   },
+    expert: { holes: 57, base: 1300, label: 'Expert' }
+  };
+  var MAX_ERR = 3, MAX_HINTS = 3;
+
+  /* ==============================================================
+     Generator (backtracking) + digger with uniqueness check
+     ============================================================== */
+  function emptyGrid() { return new Array(81).fill(0); }
+
+  function canPlace(g, i, v) {
+    var r = Math.floor(i / 9), c = i % 9;
+    for (var k = 0; k < 9; k++) {
+      if (g[r * 9 + k] === v) return false;
+      if (g[k * 9 + c] === v) return false;
+    }
+    var br = Math.floor(r / 3) * 3, bc = Math.floor(c / 3) * 3;
+    for (var a = 0; a < 3; a++) {
+      for (var b = 0; b < 3; b++) {
+        if (g[(br + a) * 9 + bc + b] === v) return false;
+      }
+    }
+    return true;
+  }
+
+  function shuffled() {
+    var a = [1,2,3,4,5,6,7,8,9];
+    for (var i = 8; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function fill(g, pos) {
+    if (pos === undefined) pos = 0;
+    if (pos === 81) return true;
+    if (g[pos] !== 0) return fill(g, pos + 1);
+    var order = shuffled();
+    for (var i = 0; i < 9; i++) {
+      if (canPlace(g, pos, order[i])) {
+        g[pos] = order[i];
+        if (fill(g, pos + 1)) return true;
+        g[pos] = 0;
+      }
+    }
+    return false;
+  }
+
+  /** Count solutions, bailing out at `cap`. */
+  function countSolutions(g, cap) {
+    var best = -1, bestCands = null;
+    for (var i = 0; i < 81; i++) {
+      if (g[i] !== 0) continue;
+      var cands = [];
+      for (var v = 1; v <= 9; v++) if (canPlace(g, i, v)) cands.push(v);
+      if (cands.length === 0) return 0;
+      if (best === -1 || cands.length < bestCands.length) { best = i; bestCands = cands; }
+      if (cands.length === 1) break;
+    }
+    if (best === -1) return 1;
+
+    var total = 0;
+    for (var k = 0; k < bestCands.length; k++) {
+      g[best] = bestCands[k];
+      total += countSolutions(g, cap - total);
+      g[best] = 0;
+      if (total >= cap) return total;
+    }
+    return total;
+  }
+
+  function makePuzzle(holes) {
+    var solution = emptyGrid();
+    fill(solution);
+
+    var puzzle = solution.slice();
+    var order = [];
+    for (var i = 0; i < 81; i++) order.push(i);
+    for (var i2 = 80; i2 > 0; i2--) {
+      var j = Math.floor(Math.random() * (i2 + 1));
+      var t = order[i2]; order[i2] = order[j]; order[j] = t;
+    }
+
+    var removed = 0;
+    for (var k = 0; k < order.length && removed < holes; k++) {
+      var idx = order[k];
+      var backup = puzzle[idx];
+      puzzle[idx] = 0;
+      var test = puzzle.slice();
+      if (countSolutions(test, 2) !== 1) puzzle[idx] = backup;
+      else removed++;
+    }
+    return { puzzle: puzzle, solution: solution };
+  }
+
+  /* ==============================================================
+     State
+     ============================================================== */
+  var gridEl = document.getElementById('grid');
+  var padEl  = document.getElementById('pad');
+  var cells  = [];
+
+  var S = {
+    puzzle: [], solution: [], value: [],
+    notes: [],           // array of Sets
+    sel: -1,
+    errors: 0, hintsLeft: MAX_HINTS, hintsUsed: 0,
+    notesMode: false, started: false, over: false, diff: 'medium'
+  };
+
+  var timer = Asviora.Timer(function () {
+    document.getElementById('uiTime').textContent = timer.format();
+  });
+
+  /* ==============================================================
+     Build DOM
+     ============================================================== */
+  function buildGrid() {
+    gridEl.innerHTML = '';
+    cells = [];
+    for (var i = 0; i < 81; i++) {
+      var r = Math.floor(i / 9), c = i % 9;
+      var b = document.createElement('button');
+      b.className = 'cell';
+      if (c === 2 || c === 5) b.classList.add('bx-r');
+      if (r === 2 || r === 5) b.classList.add('bx-b');
+      b.dataset.i = i;
+      b.addEventListener('click', (function (idx) {
+        return function () { select(idx); };
+      })(i));
+      gridEl.appendChild(b);
+      cells.push(b);
+    }
+  }
+
+  function buildPad() {
+    padEl.innerHTML = '';
+    for (var n = 1; n <= 9; n++) {
+      var b = document.createElement('button');
+      b.className = 'num';
+      b.dataset.n = n;
+      b.innerHTML = n + '<span class="left"></span>';
+      b.addEventListener('click', (function (v) {
+        return function () { enter(v); };
+      })(n));
+      padEl.appendChild(b);
+    }
+  }
+
+  /* ==============================================================
+     New game
+     ============================================================== */
+  function newGame() {
+    S.diff = document.getElementById('selDiff').value;
+    document.getElementById('hintLine').textContent = 'Generating a fresh ' +
+      DIFF[S.diff].label.toLowerCase() + ' puzzle…';
+
+    // let the UI paint the message before the (blocking) generator runs
+    setTimeout(function () {
+      var made = makePuzzle(DIFF[S.diff].holes);
+      S.puzzle   = made.puzzle;
+      S.solution = made.solution;
+      S.value    = made.puzzle.slice();
+      S.notes    = [];
+      for (var i = 0; i < 81; i++) S.notes.push(new Set());
+
+      S.sel = -1;
+      S.errors = 0;
+      S.hintsLeft = MAX_HINTS;
+      S.hintsUsed = 0;
+      S.notesMode = false;
+      S.started = false;
+      S.over = false;
+
+      timer.reset();
+      document.getElementById('btnNotes').textContent = '✏️ Notes: Off';
+      document.getElementById('btnNotes').classList.remove('on');
+      paint();
+      document.getElementById('hintLine').textContent =
+        'Tap a cell, then a number. Keyboard 1–9 works too — Backspace erases, N toggles notes.';
+    }, 30);
+  }
+
+  /* ==============================================================
+     Paint
+     ============================================================== */
+  function paint() {
+    var filled = 0;
+    var selVal = S.sel >= 0 ? S.value[S.sel] : 0;
+
+    for (var i = 0; i < 81; i++) {
+      var el = cells[i], v = S.value[i];
+      var given = S.puzzle[i] !== 0;
+
+      el.classList.toggle('given', given);
+      el.classList.remove('peer', 'same', 'sel', 'bad');
+
+      if (v !== 0) {
+        filled++;
+        el.textContent = v;
+        if (!given && v !== S.solution[i]) el.classList.add('bad');
+      } else if (S.notes[i] && S.notes[i].size) {
+        var html = '<span class="notes">';
+        for (var n = 1; n <= 9; n++) {
+          html += '<span>' + (S.notes[i].has(n) ? n : '') + '</span>';
+        }
+        html += '</span>';
+        el.innerHTML = html;
+      } else {
+        el.textContent = '';
+      }
+    }
+
+    if (S.sel >= 0) {
+      var sr = Math.floor(S.sel / 9), sc = S.sel % 9;
+      var sbr = Math.floor(sr / 3), sbc = Math.floor(sc / 3);
+      for (var k = 0; k < 81; k++) {
+        var r = Math.floor(k / 9), c = k % 9;
+        if (r === sr || c === sc ||
+            (Math.floor(r / 3) === sbr && Math.floor(c / 3) === sbc)) {
+          cells[k].classList.add('peer');
+        }
+        if (selVal !== 0 && S.value[k] === selVal) cells[k].classList.add('same');
+      }
+      cells[S.sel].classList.add('sel');
+    }
+
+    document.getElementById('uiFilled').textContent = filled + '/81';
+    document.getElementById('uiErr').textContent    = S.errors + '/' + MAX_ERR;
+    document.getElementById('uiHints').textContent  = S.hintsLeft;
+
+    // pad counters: how many of each digit remain
+    for (var d = 1; d <= 9; d++) {
+      var used = S.value.filter(function (x) { return x === d; }).length;
+      var btn = padEl.children[d - 1];
+      btn.classList.toggle('spent', used >= 9);
+      btn.querySelector('.left').textContent = used >= 9 ? '' : (9 - used);
+    }
+  }
+
+  function select(i) {
+    if (S.over) return;
+    S.sel = i;
+    paint();
+  }
+
+  /* ==============================================================
+     Entry
+     ============================================================== */
+  function enter(v) {
+    if (S.over || S.sel < 0) {
+      if (S.sel < 0) Asviora.toast('Pick a cell first', 'error');
+      return;
+    }
+    var i = S.sel;
+    if (S.puzzle[i] !== 0) return;
+
+    if (!S.started) { S.started = true; timer.start(); }
+
+    if (S.notesMode) {
+      if (S.value[i] !== 0) return;
+      if (S.notes[i].has(v)) S.notes[i].delete(v);
+      else S.notes[i].add(v);
+      paint();
+      return;
+    }
+
+    if (S.value[i] === v) { S.value[i] = 0; paint(); return; }
+
+    S.value[i] = v;
+    S.notes[i].clear();
+
+    if (v !== S.solution[i]) {
+      S.errors++;
+      Asviora.toast(v + ' does not belong there', 'error');
+      paint();
+      if (S.errors >= MAX_ERR) { gameOver(); return; }
+      return;
+    }
+
+    // clear that digit from the notes of its peers
+    var r = Math.floor(i / 9), c = i % 9;
+    var br = Math.floor(r / 3), bc = Math.floor(c / 3);
+    for (var k = 0; k < 81; k++) {
+      var kr = Math.floor(k / 9), kc = k % 9;
+      if (kr === r || kc === c || (Math.floor(kr / 3) === br && Math.floor(kc / 3) === bc)) {
+        S.notes[k].delete(v);
+      }
+    }
+
+    cells[i].classList.add('done');
+    setTimeout(function () { cells[i].classList.remove('done'); }, 320);
+    paint();
+
+    if (isComplete()) win();
+  }
+
+  function erase() {
+    if (S.over || S.sel < 0) return;
+    var i = S.sel;
+    if (S.puzzle[i] !== 0) return;
+    S.value[i] = 0;
+    S.notes[i].clear();
+    paint();
+  }
+
+  function isComplete() {
+    for (var i = 0; i < 81; i++) {
+      if (S.value[i] !== S.solution[i]) return false;
+    }
+    return true;
+  }
+
+  /* ==============================================================
+     Hint / check
+     ============================================================== */
+  function hint() {
+    if (S.over) return;
+    if (S.hintsLeft <= 0) { Asviora.toast('No hints left', 'error'); return; }
+
+    // prefer the selected cell, otherwise the first empty/wrong one
+    var target = -1;
+    if (S.sel >= 0 && S.puzzle[S.sel] === 0 && S.value[S.sel] !== S.solution[S.sel]) {
+      target = S.sel;
+    } else {
+      for (var i = 0; i < 81; i++) {
+        if (S.puzzle[i] === 0 && S.value[i] !== S.solution[i]) { target = i; break; }
+      }
+    }
+    if (target === -1) { Asviora.toast('Nothing left to reveal', 'error'); return; }
+
+    if (!S.started) { S.started = true; timer.start(); }
+
+    S.hintsLeft--;
+    S.hintsUsed++;
+    S.value[target] = S.solution[target];
+    S.notes[target].clear();
+    S.sel = target;
+    paint();
+    cells[target].classList.add('hinted');
+    setTimeout(function () { cells[target].classList.remove('hinted'); }, 1800);
+    document.getElementById('hintLine').textContent =
+      'Hint used — each one costs 12% of your final score. ' + S.hintsLeft + ' left.';
+
+    if (isComplete()) win();
+  }
+
+  function check() {
+    if (S.over) return;
+    var wrong = 0, empty = 0;
+    for (var i = 0; i < 81; i++) {
+      if (S.value[i] === 0) empty++;
+      else if (S.value[i] !== S.solution[i]) wrong++;
+    }
+    if (wrong === 0 && empty === 0) { win(); return; }
+    Asviora.toast(
+      wrong === 0
+        ? 'All good so far — ' + empty + ' cell' + (empty === 1 ? '' : 's') + ' left'
+        : wrong + ' wrong entr' + (wrong === 1 ? 'y' : 'ies') + ' on the board',
+      wrong === 0 ? 'ok' : 'error'
+    );
+  }
+
+  /* ==============================================================
+     End states
+     ============================================================== */
+  function win() {
+    if (S.over) return;
+    S.over = true;
+    timer.stop();
+
+    var cfg = DIFF[S.diff];
+    var t = timer.value;
+    var timeBonus = Math.max(0, 900 - t * 2);
+    var errPen    = S.errors * Math.round(cfg.base * 0.1);
+    var total = cfg.base + timeBonus - errPen;
+    total = total * Math.pow(0.88, S.hintsUsed);
+    if (S.errors === 0 && S.hintsUsed === 0) total *= 1.2;   // flawless bonus
+    total = Math.max(40, Math.round(total));
+
+    document.getElementById('mIco').textContent   = S.hintsUsed === 0 && S.errors === 0 ? '🏆' : '🎉';
+    document.getElementById('mTitle').textContent = 'Puzzle Solved!';
+    document.getElementById('mText').textContent  = (S.errors === 0 && S.hintsUsed === 0)
+      ? 'Flawless — no mistakes, no hints. 20% bonus applied.'
+      : 'Clean logic. Speed and accuracy both count.';
+    document.getElementById('mScore').textContent = total.toLocaleString('en-IN');
+    document.getElementById('mDiff').textContent  = cfg.label;
+    document.getElementById('mTime').textContent  = timer.format();
+    document.getElementById('mErr').textContent   = S.errors;
+    document.getElementById('mHints').textContent = S.hintsUsed;
+    document.getElementById('modal').classList.add('show');
+
+    paint();
+    Asviora.submit({
+      score: total,
+      time_taken: t,
+      moves: 81 - DIFF[S.diff].holes,
+      difficulty: S.diff,
+      result: 'win',
+      meta: cfg.label + ', ' + S.errors + ' mistakes, ' + S.hintsUsed + ' hints'
+    });
+  }
+
+  function gameOver() {
+    S.over = true;
+    timer.stop();
+    document.getElementById('mIco').textContent   = '💥';
+    document.getElementById('mTitle').textContent = 'Out of Lives';
+    document.getElementById('mText').textContent  =
+      'Three mistakes ends the round. Try an easier level or use pencil notes.';
+    document.getElementById('mScore').textContent = '0';
+    document.getElementById('mDiff').textContent  = DIFF[S.diff].label;
+    document.getElementById('mTime').textContent  = timer.format();
+    document.getElementById('mErr').textContent   = S.errors;
+    document.getElementById('mHints').textContent = S.hintsUsed;
+    document.getElementById('modal').classList.add('show');
+
+    Asviora.submit({
+      score: 0, time_taken: timer.value, moves: 0,
+      difficulty: S.diff, result: 'loss',
+      meta: 'failed after ' + S.errors + ' mistakes'
+    });
+  }
+
+  /* ==============================================================
+     Controls
+     ============================================================== */
+  document.getElementById('btnNew').addEventListener('click', newGame);
+  document.getElementById('selDiff').addEventListener('change', newGame);
+  document.getElementById('btnErase').addEventListener('click', erase);
+  document.getElementById('btnHint').addEventListener('click', hint);
+  document.getElementById('btnCheck').addEventListener('click', check);
+  document.getElementById('btnNotes').addEventListener('click', function () {
+    S.notesMode = !S.notesMode;
+    this.textContent = '✏️ Notes: ' + (S.notesMode ? 'On' : 'Off');
+    this.classList.toggle('on', S.notesMode);
+  });
+  document.getElementById('mClose').addEventListener('click', function () {
+    document.getElementById('modal').classList.remove('show');
+  });
+  document.getElementById('mAgain').addEventListener('click', function () {
+    document.getElementById('modal').classList.remove('show');
+    newGame();
+  });
+
+  window.addEventListener('keydown', function (e) {
+    if (e.target.tagName === 'SELECT') return;
+    if (e.key >= '1' && e.key <= '9') { e.preventDefault(); enter(parseInt(e.key, 10)); return; }
+    if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') { e.preventDefault(); erase(); return; }
+    if (e.key.toLowerCase() === 'n') { document.getElementById('btnNotes').click(); return; }
+    if (e.key.toLowerCase() === 'h') { hint(); return; }
+
+    var map = { ArrowUp: -9, ArrowDown: 9, ArrowLeft: -1, ArrowRight: 1 };
+    if (map[e.key] !== undefined) {
+      e.preventDefault();
+      var next = (S.sel < 0 ? 0 : S.sel + map[e.key]);
+      if (next >= 0 && next < 81) {
+        // don't wrap across rows on left/right
+        if (Math.abs(map[e.key]) === 1 && Math.floor(next / 9) !== Math.floor((S.sel < 0 ? 0 : S.sel) / 9)) return;
+        select(next);
+      }
+    }
+  });
+
+  /* ---------- go ---------- */
+  buildGrid();
+  buildPad();
+  newGame();
+})();
+</script>
+</body>
+</html>

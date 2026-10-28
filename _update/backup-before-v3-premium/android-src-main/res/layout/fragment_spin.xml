@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/bg"
+    android:padding="18dp" android:gravity="center_horizontal">
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        style="@style/H1" android:layout_marginTop="14dp" android:text="Daily spin" />
+
+    <TextView android:id="@+id/note" android:layout_width="match_parent"
+        android:layout_height="wrap_content" style="@style/Muted"
+        android:gravity="center" android:layout_marginTop="6dp" />
+
+    <TextView android:id="@+id/limits" android:layout_width="match_parent"
+        android:layout_height="wrap_content" style="@style/Muted"
+        android:gravity="center" android:layout_marginTop="4dp"
+        android:textColor="@color/cyan" android:visibility="gone" />
+
+    <TextView android:id="@+id/adminNote" android:layout_width="match_parent"
+        android:layout_height="wrap_content" style="@style/Muted"
+        android:gravity="center" android:layout_marginTop="8dp"
+        android:background="@drawable/bg_pill" android:padding="10dp"
+        android:textColor="@color/gold" android:visibility="gone" />
+
+    <com.asviora.games.view.SpinWheelView android:id="@+id/wheel"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="18dp" />
+
+    <TextView android:id="@+id/result" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:textSize="24sp"
+        android:textStyle="bold" android:textColor="@color/gold"
+        android:layout_marginTop="14dp" />
+
+    <Button android:id="@+id/spin" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginTop="14dp"
+        android:text="Spin the wheel" style="@style/Primary" />
+</LinearLayout>

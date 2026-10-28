@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The landing tab.
+
+  One hero card carries the two numbers a player actually opens the app for
+  — coins and level — and everything under it is a way in. The tiles are
+  plain surfaces on purpose: if the shortcuts competed with the balance for
+  attention, neither would win.
+-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/bg" android:scrollbars="none">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="18dp">
+
+        <!-- greeting -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical"
+            android:layout_marginTop="16dp">
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    style="@style/Label" android:text="Welcome back" />
+                <TextView android:id="@+id/greet" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" style="@style/H1"
+                    android:layout_marginTop="2dp" android:text="Hello" />
+            </LinearLayout>
+
+            <ImageView android:layout_width="40dp" android:layout_height="40dp"
+                android:src="@drawable/logo_mark" android:alpha="0.9"
+                android:contentDescription="@string/app_name" />
+        </LinearLayout>
+
+        <!-- coins + level -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:layout_marginTop="18dp"
+            style="@style/Card.Hero">
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        style="@style/Label" android:text="Coins" />
+                    <TextView android:id="@+id/coins" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" style="@style/Stat"
+                        android:textColor="@color/gold" android:text="0"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+
+                <View android:layout_width="1dp" android:layout_height="match_parent"
+                    android:background="@color/line_soft" android:layout_marginEnd="18dp" />
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        style="@style/Label" android:text="Rank" />
+                    <TextView android:id="@+id/level" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" style="@style/Stat"
+                        android:textColor="@color/green" android:text="Level 1"
+                        android:textSize="22sp" android:layout_marginTop="4dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <ProgressBar android:id="@+id/xpBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent" android:layout_height="5dp"
+                android:layout_marginTop="16dp"
+                android:max="100" android:progress="0"
+                android:progressDrawable="@drawable/bg_progress" />
+
+            <TextView android:id="@+id/xp" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" style="@style/Muted"
+                android:layout_marginTop="8dp" android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- ways in -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            style="@style/Label" android:layout_marginTop="24dp"
+            android:layout_marginBottom="10dp" android:text="Jump back in" />
+
+        <LinearLayout android:id="@+id/goQuiz" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="vertical"
+            style="@style/Card" android:clickable="true" android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                style="@style/H2" android:text="Quiz levels" />
+            <TextView android:id="@+id/quizLine" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" style="@style/Muted"
+                android:layout_marginTop="4dp" android:text="Carry on where you left off" />
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/goSpin" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="vertical"
+            android:layout_marginTop="12dp" style="@style/Card"
+            android:clickable="true" android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                style="@style/H2" android:text="Daily spin" />
+            <TextView android:id="@+id/spinLine" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" style="@style/Muted"
+                android:layout_marginTop="4dp" android:text="Check your spins" />
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/goExam" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="vertical"
+            android:layout_marginTop="12dp" style="@style/Card"
+            android:clickable="true" android:focusable="true" android:visibility="gone"
+            android:foreground="?android:attr/selectableItemBackground">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="horizontal" android:gravity="center_vertical">
+                <TextView android:id="@+id/examTitle" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" style="@style/H2"
+                    android:text="@string/govt_exam" />
+                <TextView android:id="@+id/examBadge" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_pill" android:paddingLeft="9dp"
+                    android:paddingRight="9dp" android:paddingTop="3dp" android:paddingBottom="3dp"
+                    android:textColor="@color/gold" android:textSize="10sp"
+                    android:textStyle="bold" android:letterSpacing="0.1"
+                    android:text="@string/soon" />
+            </LinearLayout>
+            <TextView android:id="@+id/examLine" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" style="@style/Muted"
+                android:layout_marginTop="4dp"
+                android:text="WBCS, SSC, Railway, Banking — coming soon" />
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/goGames" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="vertical"
+            android:layout_marginTop="12dp" android:layout_marginBottom="8dp"
+            style="@style/Card" android:clickable="true" android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                style="@style/H2" android:text="Games" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                style="@style/Muted" android:layout_marginTop="4dp"
+                android:text="Chess, Sudoku, Memory and the 3D cube" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

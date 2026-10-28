@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The logo's ring: gold sweeping into lime. Spun slowly behind the emblem. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="ring"
+    android:innerRadiusRatio="2.35"
+    android:thicknessRatio="26"
+    android:useLevel="false">
+    <gradient android:type="sweep"
+        android:startColor="#00E8BE55"
+        android:centerColor="#FFE8BE55"
+        android:endColor="#FFD6F75C"
+        android:useLevel="false" />
+</shape>

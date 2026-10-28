@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Taken from the website's dark theme so the app and the site
+         obviously belong to each other. -->
+    <color name="bg">#0B0F16</color>
+    <color name="bg2">#111823</color>
+    <color name="surface">#151B23</color>
+    <color name="line">#29313D</color>
+    <color name="text">#E4EAF3</color>
+    <color name="muted">#8B97A8</color>
+
+    <color name="green">#8FCE3F</color>
+    <color name="green_dark">#4A7616</color>
+    <color name="gold">#E5B84B</color>
+    <color name="cyan">#56B0F0</color>
+    <color name="danger">#F2637E</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+</resources>

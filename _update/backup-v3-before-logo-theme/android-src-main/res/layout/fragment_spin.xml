@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:scrollbars="none" android:overScrollMode="never"
+    android:clipToPadding="false"
+    android:paddingBottom="@dimen/nav_clearance">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:gravity="center_horizontal"
+        android:paddingStart="@dimen/gutter" android:paddingEnd="@dimen/gutter"
+        android:paddingTop="24dp">
+
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            style="@style/Display" android:text="@string/spin_title" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            style="@style/Muted" android:layout_marginTop="2dp"
+            android:text="@string/spin_sub" />
+
+        <!-- status chips -->
+        <TextView android:id="@+id/note"
+            style="@style/Chip.Green"
+            android:layout_marginTop="16dp"
+            android:textSize="12sp"
+            android:paddingTop="7dp" android:paddingBottom="7dp"
+            android:drawableStart="@drawable/ic_bolt_sm"
+            android:gravity="center" />
+
+        <TextView android:id="@+id/limits" android:layout_width="match_parent"
+            android:layout_height="wrap_content" style="@style/Muted"
+            android:gravity="center" android:layout_marginTop="8dp"
+            android:textSize="12sp"
+            android:textColor="@color/cyan" android:visibility="gone" />
+
+        <TextView android:id="@+id/adminNote" android:layout_width="match_parent"
+            android:layout_height="wrap_content" style="@style/Muted"
+            android:gravity="center" android:layout_marginTop="10dp"
+            android:background="@drawable/bg_pill" android:padding="12dp"
+            android:textColor="@color/gold_bright" android:visibility="gone" />
+
+        <!-- the wheel on a glowing stage -->
+        <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="12dp">
+
+            <View android:id="@+id/wheelGlow"
+                android:layout_width="match_parent" android:layout_height="match_parent"
+                android:background="@drawable/bg_wheel_stage" />
+
+            <com.asviora.games.view.SpinWheelView android:id="@+id/wheel"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_margin="12dp" />
+        </FrameLayout>
+
+        <TextView android:id="@+id/result" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:textSize="28sp"
+            android:fontFamily="sans-serif-black"
+            android:textColor="@color/gold_bright"
+            android:layout_marginTop="4dp" />
+
+        <Button android:id="@+id/spin" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="14dp"
+            android:minHeight="60dp" android:textSize="17sp"
+            android:text="Spin the wheel" style="@style/Primary.Gold" />
+    </LinearLayout>
+</ScrollView>

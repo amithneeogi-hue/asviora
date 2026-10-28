@@ -1,0 +1,19 @@
+# ==================================================================
+# The game HTML is served by /game-frame.php, which checks the login
+# session first. Denying the raw files here closes the side door: a
+# guessed URL such as /games/sudoku/index.html now returns 403 instead
+# of a playable page.
+#
+# Only .html/.htm is blocked. engine.js, images and anything else in
+# these folders still load normally, because the browser asks for them
+# by their real paths after game-frame.php has served the page.
+# ==================================================================
+<FilesMatch "\.(html|htm)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>

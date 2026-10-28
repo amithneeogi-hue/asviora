@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>3D Cube Solver | Asviora Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/game.css">
+<style>
+  #stage {
+    width: 100%; height: 100%;
+    display: grid; place-items: center;      /* belt and braces on centring */
+    cursor: grab; touch-action: none;
+    overflow: hidden;
+  }
+  #stage.dragging { cursor: grabbing; }
+  /* The canvas is centred by the grid above; these keep it from ever laying
+     out larger than the stage no matter what the renderer writes. */
+  #stage canvas { display: block; max-width: 100%; max-height: 100%; }
+
+  .move-pad { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  .move-key {
+    width: 46px; height: 42px;
+    display: grid; place-items: center;
+    font: 900 .92rem/1 "Plus Jakarta Sans", sans-serif;
+    background: var(--surface); color: var(--text);
+    border: 1px solid var(--line); border-radius: 11px;
+    cursor: pointer; transition: all .16s var(--ease);
+    font-variant-numeric: tabular-nums;
+  }
+  .move-key:hover { border-color: var(--green); color: var(--green); transform: translateY(-2px); }
+  .move-key:active { transform: scale(.92); }
+  .move-key.prime { color: var(--gold); }
+  .move-key.prime:hover { border-color: var(--gold); }
+  .move-key.next {
+    border-color: var(--green); background: rgba(164,217,76,.16); color: var(--green);
+    animation: keyPulse 1.1s ease-in-out infinite;
+  }
+  @keyframes keyPulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(164,217,76,.5) }
+    50%     { box-shadow: 0 0 0 7px rgba(164,217,76,0) }
+  }
+
+  .pad-rows { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .pad-label { font-size: .6rem; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); font-weight: 800; }
+
+  #solveLog {
+    font: 700 .78rem/1.5 "Plus Jakarta Sans", sans-serif;
+    color: var(--muted); text-align: center;
+    max-width: 560px; margin-inline: auto;
+    min-height: 1.5em; word-break: break-word;
+  }
+  #solveLog b { color: var(--green); }
+
+  @media (max-width: 720px) {
+    .move-key { width: 42px; height: 40px; font-size: .86rem; }
+
+    /* On touch screens the cube itself is the controller, so the key pad is
+       dead weight — hide it and hand the space to the 3D stage, which is
+       flex:1 and grows into whatever the pad gave up. */
+    .move-pad { display: none; }
+    #solveLog { font-size: .74rem; }
+
+    /* Trim the header too — four stats, a select and four buttons were
+       wrapping onto three rows and eating the cube's headroom. */
+    .g-shell { padding: 8px; gap: 7px; }
+    .g-bar { padding: 7px 9px; gap: 7px; row-gap: 7px; }
+    .g-stat { min-width: 0; flex: 1 1 auto; }
+    .g-stat .s-l { font-size: .54rem; letter-spacing: .1em; }
+    .g-stat .s-v { font-size: .86rem; }
+  }
+  @media (max-width: 460px) {
+    .move-key { width: 38px; height: 36px; font-size: .8rem; border-radius: 9px; }
+    .move-pad { gap: 4px; }
+  }
+</style>
+</head>
+<body data-game="cube3d">
+
+<div class="g-shell">
+
+  <!-- ---------- top bar ---------- -->
+  <div class="g-bar">
+    <div class="g-stat"><span class="s-l">Time</span><span class="s-v" id="uiTime">00:00</span></div>
+    <div class="g-sep"></div>
+    <div class="g-stat"><span class="s-l">Moves</span><span class="s-v" id="uiMoves">0</span></div>
+    <div class="g-sep"></div>
+    <div class="g-stat gold"><span class="s-l">Scramble</span><span class="s-v" id="uiDepth">0</span></div>
+    <div class="g-sep"></div>
+    <div class="g-stat hi"><span class="s-l">Status</span><span class="s-v" id="uiState" style="font-size:.82rem">Solved</span></div>
+
+    <span class="g-spacer"></span>
+
+    <select class="g-select" id="selDepth" title="Scramble difficulty">
+      <option value="8">Easy &middot; 8 turns</option>
+      <option value="15" selected>Medium &middot; 15 turns</option>
+      <option value="22">Hard &middot; 22 turns</option>
+      <option value="30">Expert &middot; 30 turns</option>
+    </select>
+    <button class="gb primary" id="btnScramble">&#127922; Scramble</button>
+    <button class="gb" id="btnHint">&#128161; Hint</button>
+    <button class="gb gold" id="btnSolve">&#9889; Auto-Solve</button>
+    <button class="gb" id="btnReset">&#8635; Reset</button>
+  </div>
+
+  <!-- ---------- 3d stage ---------- -->
+  <div class="g-stage">
+    <div id="stage"></div>
+
+    <div class="g-modal" id="modal">
+      <div class="g-modal-box">
+        <div class="m-ico" id="mIco">&#127881;</div>
+        <h2 id="mTitle">Cube Solved!</h2>
+        <p id="mText">Clean work. Fewer moves and faster times score higher.</p>
+        <div class="g-modal-score" id="mScore">0</div>
+        <div class="g-modal-sub">Points earned</div>
+        <div class="g-modal-rows">
+          <div class="r"><span class="k">Scramble depth</span><span class="v" id="mDepth">0</span></div>
+          <div class="r"><span class="k">Your moves</span><span class="v" id="mMoves">0</span></div>
+          <div class="r"><span class="k">Time taken</span><span class="v" id="mTime">00:00</span></div>
+          <div class="r"><span class="k">Efficiency</span><span class="v" id="mEff">&mdash;</span></div>
+        </div>
+        <div class="g-modal-actions">
+          <button class="gb primary" id="mAgain">Scramble Again</button>
+          <button class="gb" id="mClose">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- move controls ---------- -->
+  <div class="g-controls pad-rows">
+    <div class="move-pad" id="padMain"></div>
+    <div id="solveLog">Swipe across a face to turn it &mdash; drag beside the cube, or use two fingers, to look around. Keys <b>U D L R F B</b> also work (<b>Shift</b> reverses).</div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="../../assets/js/game-sdk.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ==============================================================
+     Config
+     ============================================================== */
+  var COLORS = {
+    R: 0xd93b3b, // +X  right   red
+    O: 0xe98c2a, // -X  left    orange
+    W: 0xf2f4f7, // +Y  up      white
+    Y: 0xe8cf3f, // -Y  down    yellow
+    G: 0x62b544, // +Z  front   green
+    B: 0x3573c9, // -Z  back    blue
+    K: 0x11151a  // inner
+  };
+
+  var MOVES = ['U', "U'", 'D', "D'", 'L', "L'", 'R', "R'", 'F', "F'", 'B', "B'"];
+
+  // axis / layer / direction for each base face
+  var FACE = {
+    U: { axis: 'y', layer:  1, dir: -1 },
+    D: { axis: 'y', layer: -1, dir:  1 },
+    R: { axis: 'x', layer:  1, dir: -1 },
+    L: { axis: 'x', layer: -1, dir:  1 },
+    F: { axis: 'z', layer:  1, dir: -1 },
+    B: { axis: 'z', layer: -1, dir:  1 },
+    // Middle slices. Only reachable by dragging a centre row — there are no
+    // buttons or keys for them — but without these a swipe across the middle
+    // of a face would have nothing to turn.
+    M: { axis: 'x', layer:  0, dir:  1 },
+    E: { axis: 'y', layer:  0, dir:  1 },
+    S: { axis: 'z', layer:  0, dir: -1 }
+  };
+
+  var CUBIE = 0.96, GAP = 1.0, TURN_MS = 170;
+
+  /* ==============================================================
+     Scene
+     ============================================================== */
+  var stage = document.getElementById('stage');
+  var scene, camera, renderer, cubeGroup, cubelets = [];
+
+  function initScene() {
+    scene = new THREE.Scene();
+
+    camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+    camera.position.set(4.6, 4.2, 6.0);
+    camera.lookAt(0, 0, 0);
+
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    stage.appendChild(renderer.domElement);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.72));
+
+    var key = new THREE.DirectionalLight(0xffffff, 0.7);
+    key.position.set(6, 9, 7);
+    scene.add(key);
+
+    var rim = new THREE.DirectionalLight(0xa4d94c, 0.32);
+    rim.position.set(-7, -4, -6);
+    scene.add(rim);
+
+    var gold = new THREE.PointLight(0xe5b84b, 0.35, 22);
+    gold.position.set(-5, 5, 5);
+    scene.add(gold);
+
+    cubeGroup = new THREE.Group();
+    cubeGroup.rotation.set(-0.24, -0.62, 0);
+    scene.add(cubeGroup);
+
+    buildCube();
+    resize();
+    window.addEventListener('resize', resize);
+    animate();
+  }
+
+  // Radius of the sphere that contains the cube in any orientation:
+  // half-extent (1 + CUBIE/2) along all three axes.
+  var FIT_RADIUS = (GAP + CUBIE / 2) * Math.sqrt(3);
+
+  function resize() {
+    var w = stage.clientWidth || 480;
+    var h = stage.clientHeight || 400;
+
+    // updateStyle must stay on. With it off, three.js sizes the drawing
+    // buffer to w * pixelRatio but never writes a CSS size, so on a 2x phone
+    // the canvas lays out at twice the stage and spills off the right and
+    // bottom edges instead of sitting in the middle.
+    renderer.setSize(w, h);
+
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+
+    // Place the camera at the exact distance where the cube fills the frame,
+    // instead of a few hardcoded guesses. A sphere of radius R fits when
+    // d >= R / sin(fov/2) — checked against both the vertical and the
+    // horizontal field of view, so it never crops on a narrow phone.
+    var vFov = camera.fov * Math.PI / 180;
+    var hFov = 2 * Math.atan(Math.tan(vFov / 2) * camera.aspect);
+    var dist = Math.max(
+      FIT_RADIUS / Math.sin(vFov / 2),
+      FIT_RADIUS / Math.sin(hFov / 2)
+    );
+
+    // Breathing room: tight on phones where every pixel counts, a little
+    // more generous on desktop where the stage is wide anyway.
+    dist *= (w < 620 ? 1.03 : 1.12);
+
+    var v = new THREE.Vector3(0.55, 0.5, 0.72).normalize().multiplyScalar(dist);
+    camera.position.copy(v);
+    camera.lookAt(0, 0, 0);
+    camera.updateProjectionMatrix();
+  }
+
+  /** Rounded-box-ish cubelet with per-face colours. */
+  function buildCube() {
+    cubelets.forEach(function (c) { cubeGroup.remove(c); });
+    cubelets = [];
+
+    var geo = new THREE.BoxGeometry(CUBIE, CUBIE, CUBIE);
+
+    for (var x = -1; x <= 1; x++) {
+      for (var y = -1; y <= 1; y++) {
+        for (var z = -1; z <= 1; z++) {
+          if (x === 0 && y === 0 && z === 0) continue;
+
+          // BoxGeometry material order: +X, -X, +Y, -Y, +Z, -Z
+          var spec = [
+            { n: [ 1, 0, 0], c: x ===  1 ? 'R' : 'K' },
+            { n: [-1, 0, 0], c: x === -1 ? 'O' : 'K' },
+            { n: [ 0, 1, 0], c: y ===  1 ? 'W' : 'K' },
+            { n: [ 0,-1, 0], c: y === -1 ? 'Y' : 'K' },
+            { n: [ 0, 0, 1], c: z ===  1 ? 'G' : 'K' },
+            { n: [ 0, 0,-1], c: z === -1 ? 'B' : 'K' }
+          ];
+
+          var mats = spec.map(function (s) {
+            return new THREE.MeshStandardMaterial({
+              color: COLORS[s.c],
+              roughness: s.c === 'K' ? 0.95 : 0.42,
+              metalness: s.c === 'K' ? 0.05 : 0.14
+            });
+          });
+
+          var m = new THREE.Mesh(geo, mats);
+          m.position.set(x * GAP, y * GAP, z * GAP);
+
+          // outward stickers, used for the solved test
+          m.userData.stickers = spec
+            .filter(function (s) { return s.c !== 'K'; })
+            .map(function (s) {
+              return { n: new THREE.Vector3(s.n[0], s.n[1], s.n[2]), c: s.c };
+            });
+
+          cubeGroup.add(m);
+          cubelets.push(m);
+
+          // thin dark outline so the stickers read clearly
+          var edge = new THREE.LineSegments(
+            new THREE.EdgesGeometry(geo),
+            new THREE.LineBasicMaterial({ color: 0x0b0e12, transparent: true, opacity: 0.55 })
+          );
+          m.add(edge);
+        }
+      }
+    }
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    if (spin && !dragging) cubeGroup.rotation.y += 0.0022;
+    renderer.render(scene, camera);
+  }
+
+  /* ==============================================================
+     Layer rotation
+     ============================================================== */
+  var busy = false, queue = [];
+
+  function applyMove(notation, duration) {
+    return new Promise(function (resolve) {
+      queue.push({ n: notation, d: duration, done: resolve });
+      pump();
+    });
+  }
+
+  function pump() {
+    if (busy || !queue.length) return;
+    var job = queue.shift();
+    busy = true;
+    doRotate(job.n, job.d, function () {
+      busy = false;
+      job.done();
+      pump();
+    });
+  }
+
+  function doRotate(notation, duration, cb) {
+    var base  = notation[0];
+    var prime = notation.indexOf("'") > -1;
+    var half  = notation.indexOf('2') > -1;
+    var f     = FACE[base];
+    if (!f) { cb(); return; }
+
+    var turns = half ? 2 : 1;
+    var angle = f.dir * (Math.PI / 2) * turns * (prime ? -1 : 1);
+
+    var pivot = new THREE.Group();
+    cubeGroup.add(pivot);
+
+    var group = cubelets.filter(function (c) {
+      return Math.round(c.position[f.axis]) === f.layer;
+    });
+    group.forEach(function (c) { pivot.attach(c); });
+
+    var t0 = null;
+    var dur = duration === undefined ? TURN_MS : duration;
+    if (dur <= 0) {
+      pivot.rotation[f.axis] = angle;
+      finish();
+      return;
+    }
+
+    function step(ts) {
+      if (t0 === null) t0 = ts;
+      var p = Math.min((ts - t0) / dur, 1);
+      var eased = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+      pivot.rotation[f.axis] = angle * eased;
+      if (p < 1) requestAnimationFrame(step);
+      else finish();
+    }
+    requestAnimationFrame(step);
+
+    function finish() {
+      pivot.updateMatrixWorld(true);
+      group.forEach(function (c) {
+        cubeGroup.attach(c);
+        c.position.x = Math.round(c.position.x);
+        c.position.y = Math.round(c.position.y);
+        c.position.z = Math.round(c.position.z);
+      });
+      cubeGroup.remove(pivot);
+      cb();
+    }
+  }
+
+  /* ==============================================================
+     Solved test
+     ============================================================== */
+  var DIRS = [
+    new THREE.Vector3( 1, 0, 0), new THREE.Vector3(-1, 0, 0),
+    new THREE.Vector3( 0, 1, 0), new THREE.Vector3( 0,-1, 0),
+    new THREE.Vector3( 0, 0, 1), new THREE.Vector3( 0, 0,-1)
+  ];
+  var AXIS_OF = ['x', 'x', 'y', 'y', 'z', 'z'];
+  var LAYER_OF = [1, -1, 1, -1, 1, -1];
+
+  function isSolved() {
+    for (var i = 0; i < DIRS.length; i++) {
+      var dir = DIRS[i], axis = AXIS_OF[i], layer = LAYER_OF[i];
+      var seen = null;
+      for (var j = 0; j < cubelets.length; j++) {
+        var c = cubelets[j];
+        if (Math.round(c.position[axis]) !== layer) continue;
+        var col = stickerFacing(c, dir);
+        if (col === null) return false;
+        if (seen === null) seen = col;
+        else if (seen !== col) return false;
+      }
+    }
+    return true;
+  }
+
+  function stickerFacing(cubelet, dir) {
+    var q = cubelet.quaternion;
+    for (var i = 0; i < cubelet.userData.stickers.length; i++) {
+      var s = cubelet.userData.stickers[i];
+      var wn = s.n.clone().applyQuaternion(q);
+      if (wn.dot(dir) > 0.9) return s.c;
+    }
+    return null;
+  }
+
+  /* ==============================================================
+     Game state
+     ============================================================== */
+  var solution = [];      // remaining moves that return the cube to solved
+  var userMoves = 0;
+  var scrambleDepth = 0;
+  var scrambled = false;
+  var autoSolving = false;
+  var spin = true;
+
+  var timer = Asviora.Timer(function () { ui.time.textContent = timer.format(); });
+
+  var ui = {
+    time:   document.getElementById('uiTime'),
+    moves:  document.getElementById('uiMoves'),
+    depth:  document.getElementById('uiDepth'),
+    state:  document.getElementById('uiState'),
+    log:    document.getElementById('solveLog')
+  };
+
+  function inverse(mv) {
+    if (mv.indexOf('2') > -1) return mv;
+    return mv.indexOf("'") > -1 ? mv[0] : mv[0] + "'";
+  }
+
+  /**
+   * Keep `solution` (the move list that still solves the cube) in step with
+   * what the player just did.
+   *   - played the next move of the solution  -> drop it
+   *   - played anything else                  -> prepend its undo
+   * Either way `solution` stays a correct solution for the current state.
+   */
+  function trackMove(mv) {
+    if (solution.length && solution[0] === mv) {
+      solution.shift();
+    } else {
+      solution.unshift(inverse(mv));
+    }
+  }
+
+  function refreshUI() {
+    ui.moves.textContent = userMoves;
+    ui.depth.textContent = scrambleDepth;
+    var solved = isSolved();
+    ui.state.textContent = autoSolving ? 'Solving…' : (solved ? 'Solved' : 'Scrambled');
+    ui.state.parentElement.classList.toggle('hi', solved);
+    ui.state.style.color = solved ? 'var(--green)' : 'var(--gold)';
+    highlightHint(null);
+  }
+
+  function highlightHint(mv) {
+    document.querySelectorAll('.move-key').forEach(function (k) {
+      k.classList.toggle('next', mv !== null && k.dataset.move === mv);
+    });
+  }
+
+  /* ==============================================================
+     Player move
+     ============================================================== */
+  function playerMove(mv) {
+    if (autoSolving || busy) return;
+    if (!scrambled) {
+      ui.log.innerHTML = 'Hit <b>Scramble</b> first — free turns on a solved cube are not scored.';
+    }
+    spin = false;
+    if (scrambled) { timer.start(); userMoves++; }
+    trackMove(mv);
+    applyMove(mv).then(function () {
+      refreshUI();
+      if (scrambled && isSolved()) finishRound(false);
+    });
+  }
+
+  /* ==============================================================
+     Scramble
+     ============================================================== */
+  function scramble() {
+    if (autoSolving || busy) return;
+    resetCube();
+
+    scrambleDepth = parseInt(document.getElementById('selDepth').value, 10);
+    var seq = [], last = '';
+    for (var i = 0; i < scrambleDepth; i++) {
+      var mv;
+      do { mv = MOVES[Math.floor(Math.random() * MOVES.length)]; }
+      while (mv[0] === last);     // avoid same-face repeats
+      last = mv[0];
+      seq.push(mv);
+    }
+
+    // the solution is the reversed inverse of the scramble
+    solution = seq.slice().reverse().map(inverse);
+
+    scrambled = true;
+    userMoves = 0;
+    spin = false;
+    timer.reset();
+
+    ui.log.innerHTML = 'Scramble: <b>' + seq.join(' ') + '</b>';
+
+    // play the scramble fast, back to back
+    var chain = Promise.resolve();
+    seq.forEach(function (mv) {
+      chain = chain.then(function () { return applyMove(mv, 78); });
+    });
+    chain.then(function () {
+      refreshUI();
+      Asviora.toast('Scrambled in ' + scrambleDepth + ' turns — your turn!');
+    });
+  }
+
+  function resetCube() {
+    timer.reset();
+    buildCube();
+    solution = [];
+    userMoves = 0;
+    scrambleDepth = 0;
+    scrambled = false;
+    spin = true;
+    ui.log.innerHTML = 'Drag to rotate the view. Buttons or keyboard <b>U D L R F B</b> ' +
+                       '(hold <b>Shift</b> for reverse).';
+    refreshUI();
+  }
+
+  /* ==============================================================
+     Hint + auto solve
+     ============================================================== */
+  function hint() {
+    if (autoSolving || busy) return;
+    if (!scrambled || isSolved()) {
+      Asviora.toast('Nothing to solve — scramble the cube first.', 'error');
+      return;
+    }
+    var mv = solution[0];
+    highlightHint(mv);
+    ui.log.innerHTML = 'Next move: <b>' + mv + '</b> &nbsp;&middot;&nbsp; ' +
+                       solution.length + ' move' + (solution.length === 1 ? '' : 's') + ' to go';
+  }
+
+  function autoSolve() {
+    if (autoSolving || busy) return;
+    if (!scrambled || isSolved()) {
+      Asviora.toast('The cube is already solved.', 'error');
+      return;
+    }
+    autoSolving = true;
+    spin = false;
+    timer.stop();
+    setBusy(true);
+    ui.log.innerHTML = 'Auto-solving: <b>' + solution.join(' ') + '</b>';
+    ui.state.textContent = 'Solving…';
+
+    var seq = solution.slice();
+    var chain = Promise.resolve();
+    seq.forEach(function (mv, i) {
+      chain = chain.then(function () {
+        highlightHint(mv);
+        ui.log.innerHTML = 'Step ' + (i + 1) + ' / ' + seq.length + ': <b>' + mv + '</b>';
+        solution.shift();
+        return applyMove(mv, 210);
+      });
+    });
+    chain.then(function () {
+      autoSolving = false;
+      setBusy(false);
+      highlightHint(null);
+      refreshUI();
+      ui.log.innerHTML = 'Solved by the auto-solver &mdash; <b>no points awarded</b>. ' +
+                         'Scramble again and solve it yourself to score.';
+      Asviora.toast('Auto-solve finished (unscored)');
+      finishRound(true);
+    });
+  }
+
+  function setBusy(on) {
+    ['btnScramble', 'btnHint', 'btnSolve', 'btnReset', 'selDepth'].forEach(function (id) {
+      document.getElementById(id).disabled = on;
+    });
+  }
+
+  /* ==============================================================
+     Scoring
+     ============================================================== */
+  function finishRound(assisted) {
+    timer.stop();
+    var t = timer.value;
+    var score = 0, eff = '—';
+
+    if (!assisted && scrambled) {
+      // base scales with scramble depth; penalties for extra moves and slow time
+      var base    = scrambleDepth * 90;
+      var optimal = Math.max(1, scrambleDepth);
+      var extra   = Math.max(0, userMoves - optimal);
+      var movePen = extra * 8;
+      var timePen = Math.floor(t * 1.6);
+      var bonus   = userMoves <= optimal ? Math.round(base * 0.35) : 0;
+      score = Math.max(20, base + bonus - movePen - timePen);
+      eff = Math.round((optimal / Math.max(optimal, userMoves)) * 100) + '%';
+    }
+
+    document.getElementById('mIco').textContent   = assisted ? '🤖' : '🎉';
+    document.getElementById('mTitle').textContent = assisted ? 'Auto-Solved' : 'Cube Solved!';
+    document.getElementById('mText').textContent  = assisted
+      ? 'The solver replayed the solution for you, so this round is not scored.'
+      : 'Clean work. Fewer moves and faster times score higher.';
+    document.getElementById('mScore').textContent = score.toLocaleString('en-IN');
+    document.getElementById('mDepth').textContent = scrambleDepth;
+    document.getElementById('mMoves').textContent = userMoves;
+    document.getElementById('mTime').textContent  = timer.format();
+    document.getElementById('mEff').textContent   = eff;
+    document.getElementById('modal').classList.add('show');
+
+    if (!assisted && score > 0) {
+      Asviora.submit({
+        score: score,
+        time_taken: t,
+        moves: userMoves,
+        difficulty: scrambleDepth <= 8 ? 'easy' : (scrambleDepth <= 15 ? 'medium'
+                    : (scrambleDepth <= 22 ? 'hard' : 'expert')),
+        result: 'win',
+        meta: 'depth ' + scrambleDepth + ', ' + userMoves + ' moves'
+      });
+    }
+    scrambled = false;
+  }
+
+  /* ==============================================================
+     Move pad
+     ============================================================== */
+  (function buildPad() {
+    var pad = document.getElementById('padMain');
+    ['U', 'D', 'L', 'R', 'F', 'B'].forEach(function (f) {
+      [f, f + "'"].forEach(function (mv) {
+        var b = document.createElement('button');
+        b.className = 'move-key' + (mv.length > 1 ? ' prime' : '');
+        b.textContent = mv.length > 1 ? f + '′' : f;
+        b.dataset.move = mv;
+        b.title = mv + ' — ' + ({U:'Up',D:'Down',L:'Left',R:'Right',F:'Front',B:'Back'})[f] +
+                  (mv.length > 1 ? ' counter-clockwise' : ' clockwise');
+        b.addEventListener('click', function () { playerMove(mv); });
+        pad.appendChild(b);
+      });
+    });
+  })();
+
+  /* ==============================================================
+     Pointer control
+
+     Swipe across a face  -> turns that layer, no buttons needed.
+     Drag the background  -> orbits the view.
+     Two fingers          -> orbits the view (so you can still look around
+                             even when the cube fills a phone screen).
+     ============================================================== */
+  var dragging = false;                 // the render loop pauses idle spin on this
+  var ray  = new THREE.Raycaster();
+  var ndc  = new THREE.Vector2();
+  var tmpQ = new THREE.Quaternion();
+
+  var mode = null;                      // 'pending' | 'turn' | 'orbit' | 'spent'
+  var grab = null;                      // what the finger landed on
+  var pointers = 0;
+  var startX = 0, startY = 0, lastX = 0, lastY = 0;
+  var TURN_SLOP = 9;                    // px of travel before a swipe commits
+
+  /** What is under the pointer? Returns the face normal and the cubelet's
+   *  grid position, both in cubeGroup space. */
+  function pick(clientX, clientY) {
+    var r = renderer.domElement.getBoundingClientRect();
+    if (!r.width || !r.height) return null;
+
+    ndc.x =  ((clientX - r.left) / r.width)  * 2 - 1;
+    ndc.y = -((clientY - r.top)  / r.height) * 2 + 1;
+    ray.setFromCamera(ndc, camera);
+
+    var hits = ray.intersectObjects(cubelets, false);
+    if (!hits.length) return null;
+
+    var h = hits[0];
+    // face.normal is in the cubelet's own space; the cubelet hangs directly
+    // off cubeGroup, so its quaternion takes us straight to cubeGroup space.
+    var n = h.face.normal.clone().applyQuaternion(h.object.quaternion);
+
+    // snap to the nearest axis — floating point drift is not welcome here
+    var ax = Math.abs(n.x), ay = Math.abs(n.y), az = Math.abs(n.z);
+    if (ax >= ay && ax >= az)      n.set(n.x > 0 ? 1 : -1, 0, 0);
+    else if (ay >= az)             n.set(0, n.y > 0 ? 1 : -1, 0);
+    else                           n.set(0, 0, n.z > 0 ? 1 : -1);
+
+    return {
+      n: n,
+      point: h.point.clone(),
+      gp: {
+        x: Math.round(h.object.position.x),
+        y: Math.round(h.object.position.y),
+        z: Math.round(h.object.position.z)
+      }
+    };
+  }
+
+  /** Screen-space direction of a cubeGroup-space vector, measured at `origin`. */
+  function toScreen(dir, origin) {
+    var q  = cubeGroup.getWorldQuaternion(tmpQ);
+    var a  = origin.clone().project(camera);
+    var b  = origin.clone()
+               .add(dir.clone().applyQuaternion(q).multiplyScalar(0.5))
+               .project(camera);
+    // NDC y grows upward, screen y grows downward
+    return new THREE.Vector2(b.x - a.x, -(b.y - a.y));
+  }
+
+  /**
+   * Turn the swipe into a move.
+   *
+   * The two axes lying in the touched face are the candidates. Whichever of
+   * them points most closely along the swipe (in screen space, so it follows
+   * however the cube is currently rotated) is the direction the surface
+   * should travel. The layer then spins about `normal x direction`, which is
+   * exactly the axis that carries the surface that way.
+   */
+  function commitTurn(dx, dy) {
+    var swipe = new THREE.Vector2(dx, dy);
+    if (swipe.lengthSq() < 1) return false;
+    swipe.normalize();
+
+    var n = grab.n, best = null;
+
+    [[1, 0, 0], [0, 1, 0], [0, 0, 1]].forEach(function (a) {
+      var t = new THREE.Vector3(a[0], a[1], a[2]);
+      if (Math.abs(t.dot(n)) > 0.5) return;          // that one is the normal
+      var sd = toScreen(t, grab.point);
+      if (sd.lengthSq() < 1e-9) return;              // edge-on to the camera
+      var d = sd.normalize().dot(swipe);
+      if (!best || Math.abs(d) > Math.abs(best.d)) best = { t: t, d: d };
+    });
+
+    if (!best) return false;
+
+    var dirVec  = best.t.multiplyScalar(best.d < 0 ? -1 : 1);
+    var axisVec = n.clone().cross(dirVec);
+    var axis    = Math.abs(axisVec.x) > 0.5 ? 'x'
+                : Math.abs(axisVec.y) > 0.5 ? 'y' : 'z';
+    var sign    = axisVec[axis] > 0 ? 1 : -1;
+    var layer   = grab.gp[axis];
+
+    for (var key in FACE) {
+      var f = FACE[key];
+      if (f.axis === axis && f.layer === layer) {
+        // doRotate turns by f.dir (negated when primed); we need `sign`
+        playerMove(f.dir === sign ? key : key + "'");
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function onDown(e) {
+    pointers++;
+    startX = lastX = e.clientX;
+    startY = lastY = e.clientY;
+    dragging = true;
+    spin = false;
+    stage.classList.add('dragging');
+
+    if (pointers > 1 || autoSolving) {   // second finger — orbit, never turn
+      mode = 'orbit';
+      grab = null;
+      return;
+    }
+
+    grab = busy ? null : pick(e.clientX, e.clientY);
+    mode = grab ? 'pending' : 'orbit';
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+    var x = e.clientX, y = e.clientY;
+
+    if (mode === 'pending') {
+      var dx = x - startX, dy = y - startY;
+      if (Math.abs(dx) + Math.abs(dy) >= TURN_SLOP) {
+        // A committed swipe fires one move; anything left over is ignored
+        // until the finger lifts, so a single drag cannot spin a layer twice.
+        mode = commitTurn(dx, dy) ? 'spent' : 'orbit';
+      }
+      lastX = x; lastY = y;
+      return;
+    }
+
+    if (mode === 'orbit') {
+      cubeGroup.rotation.y += (x - lastX) * 0.0088;
+      cubeGroup.rotation.x += (y - lastY) * 0.0088;
+      cubeGroup.rotation.x = Math.max(-1.35, Math.min(1.35, cubeGroup.rotation.x));
+    }
+    lastX = x; lastY = y;
+  }
+
+  function onUp() {
+    pointers = Math.max(0, pointers - 1);
+    if (pointers > 0) return;
+    dragging = false;
+    mode = null;
+    grab = null;
+    stage.classList.remove('dragging');
+  }
+
+  stage.addEventListener('pointerdown', onDown);
+  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointerup', onUp);
+  window.addEventListener('pointercancel', onUp);
+
+  /* ==============================================================
+     Keyboard
+     ============================================================== */
+  window.addEventListener('keydown', function (e) {
+    if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
+    var k = e.key.toUpperCase();
+    if ('UDLRFB'.indexOf(k) > -1) {
+      e.preventDefault();
+      playerMove(e.shiftKey ? k + "'" : k);
+      return;
+    }
+    if (k === ' ' || e.code === 'Space') { e.preventDefault(); scramble(); }
+    if (k === 'H') hint();
+    if (k === 'S') autoSolve();
+  });
+
+  /* ==============================================================
+     Buttons
+     ============================================================== */
+  document.getElementById('btnScramble').addEventListener('click', scramble);
+  document.getElementById('btnHint').addEventListener('click', hint);
+  document.getElementById('btnSolve').addEventListener('click', autoSolve);
+  document.getElementById('btnReset').addEventListener('click', resetCube);
+  document.getElementById('mClose').addEventListener('click', function () {
+    document.getElementById('modal').classList.remove('show');
+  });
+  document.getElementById('mAgain').addEventListener('click', function () {
+    document.getElementById('modal').classList.remove('show');
+    scramble();
+  });
+
+  /* ---------- go ---------- */
+  initScene();
+  refreshUI();
+})();
+</script>
+</body>
+</html>

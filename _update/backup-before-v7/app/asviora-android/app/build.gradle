@@ -1,0 +1,78 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.asviora.games'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.asviora.games"
+        minSdk 21
+        targetSdk 34
+        // v2 — matches the site's v6 update: spin limits, the Govt Exam
+        // section, and the signed play ticket the arcade needs now that
+        // every playable page is behind a login.
+        // v3 — premium redesign: new theme, native game top bar
+        // (back / restart / full screen), animated screens.
+        versionCode 3
+        versionName "1.2"
+
+        // Where the app talks to. Change this one line to point a build at
+        // your own server — nothing else in the code hardcodes a host.
+        buildConfigField "String", "API_BASE",
+                "\"https://asviora.in/api/v1/\""
+        buildConfigField "String", "SITE_BASE",
+                "\"https://asviora.in/\""
+    }
+
+    // Where a debug build points.
+    //
+    // 10.0.2.2 is the EMULATOR's name for the host machine's localhost. On a
+    // real phone that address does not exist, which is why a debug APK
+    // side-loaded onto a handset used to sit there timing out. So the default
+    // is now the live site, and XAMPP is opt-in:
+    //
+    //   gradle.properties (or -PdevHost=... on the command line)
+    //     devHost=http://192.168.1.20/gamesv/     <- the PC's LAN address
+    //     devHost=http://10.0.2.2/gamesv/         <- the emulator
+    //
+    // Whatever is set has to end with a slash. Cleartext HTTP is allowed for
+    // 10.0.2.2, localhost and private ranges only — see
+    // res/xml/network_security_config.xml.
+    def devHost = project.findProperty('devHost') ?: 'https://asviora.in/'
+
+    buildTypes {
+        debug {
+            buildConfigField "String", "API_BASE", "\"${devHost}api/v1/\""
+            buildConfigField "String", "SITE_BASE", "\"${devHost}\""
+            applicationIdSuffix ".debug"
+        }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                          'proguard-rules.pro'
+        }
+    }
+
+    buildFeatures {
+        buildConfig true
+        viewBinding false
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.core:core:1.13.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation 'androidx.fragment:fragment:1.8.2'
+    implementation 'com.google.android.material:material:1.12.0'
+}

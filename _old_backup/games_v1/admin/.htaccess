@@ -1,0 +1,12 @@
+Options -Indexes
+
+# Protect the shared includes from direct browsing
+<FilesMatch "^(auth|layout|layout_end)\.php$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Asviora — palette taken straight from the logo (v3.1).
+
+  The logo is a metallic gold "A" and a lime-green "S", ring and crown on a
+  brushed charcoal ground, lit from above. So is the app:
+    grounds  = charcoal, lighter at the top like the logo's spotlight
+    lime     = anything you can act on (the S / ring / crown)
+    gold     = anything you have won or that matters (the A)
+  No blues or purples — nothing that is not in the mark.
+-->
+<resources>
+    <!-- charcoal grounds, back to front -->
+    <color name="bg">#0E0F11</color>
+    <color name="bg2">#141518</color>
+    <color name="surface">#1A1B1F</color>
+    <color name="surface2">#23252A</color>
+    <color name="surface3">#2E3136</color>
+
+    <!-- glass -->
+    <color name="glass">#B31A1B1F</color>
+    <color name="glass_line">#26FFFFFF</color>
+    <color name="glass_hi">#14FFFFFF</color>
+
+    <!-- lines -->
+    <color name="line">#2E3036</color>
+    <color name="line_soft">#1C1D21</color>
+
+    <!-- type (warm white, like the logo's silver tagline) -->
+    <color name="text">#F4F1E8</color>
+    <color name="muted">#A7A59C</color>
+    <color name="dim">#6F6E68</color>
+
+    <!-- lime — the S, the ring, the crown -->
+    <color name="green">#A6D83E</color>
+    <color name="green_bright">#D6F75C</color>
+    <color name="green_dark">#4E7F1E</color>
+    <color name="green_deep">#22380E</color>
+    <color name="green_ghost">#26A6D83E</color>
+
+    <!-- gold — the A -->
+    <color name="gold">#E8BE55</color>
+    <color name="gold_bright">#F7DC7C</color>
+    <color name="gold_dark">#A87A2E</color>
+    <color name="gold_deep">#4A3414</color>
+    <color name="gold_ghost">#26E8BE55</color>
+
+    <!-- supporting tones, all from the same family -->
+    <color name="cyan">#CFE89A</color>       <!-- kept for old references: soft lime -->
+    <color name="bronze">#C98A3E</color>
+    <color name="danger">#E8554E</color>
+    <color name="danger_ghost">#24E8554E</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="ink">#101505</color>
+    <color name="scrim">#CC08090B</color>
+
+    <!-- the icon's own ground, so the splash and the launcher match -->
+    <color name="icon_bg">#0D1118</color>
+</resources>

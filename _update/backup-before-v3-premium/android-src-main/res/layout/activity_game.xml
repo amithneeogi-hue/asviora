@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The game surface, with the brand in front of it until the board is ready.
+
+  A WebView paints white for a moment before the page it is loading takes
+  over, and on a dark app that flash is the one thing that gives away that a
+  screen is a web page. The cover sits on top from the start and only fades
+  out once onPageFinished says the game is there, so what the player sees is
+  the logo, then the board.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/bg">
+
+    <WebView android:id="@+id/web"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:background="@color/bg" />
+
+    <!-- the cover -->
+    <LinearLayout android:id="@+id/cover"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:orientation="vertical" android:gravity="center"
+        android:background="@drawable/bg_brand_glow"
+        android:clickable="true" android:focusable="true">
+
+        <ImageView android:id="@+id/coverLogo"
+            android:layout_width="150dp" android:layout_height="150dp"
+            android:src="@drawable/logo_mark"
+            android:contentDescription="@string/app_name" />
+
+        <TextView android:id="@+id/coverTitle"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" style="@style/H1"
+            android:textSize="19sp" />
+
+        <TextView android:id="@+id/coverNote"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="6dp" style="@style/Muted"
+            android:letterSpacing="0.14" android:textAllCaps="true"
+            android:textSize="11sp" android:text="@string/loading" />
+
+        <ProgressBar android:id="@+id/coverBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="160dp" android:layout_height="3dp"
+            android:layout_marginTop="18dp"
+            android:max="100" android:progress="8"
+            android:progressDrawable="@drawable/bg_progress" />
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A sweep-gradient ring; spun slowly behind the logo. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="ring"
+    android:innerRadiusRatio="2.35"
+    android:thicknessRatio="28"
+    android:useLevel="false">
+    <gradient android:type="sweep"
+        android:startColor="#009BE15D"
+        android:centerColor="#FF9BE15D"
+        android:endColor="#FF4FD1FF"
+        android:useLevel="false" />
+</shape>

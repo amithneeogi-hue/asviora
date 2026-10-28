@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The launcher icon.
+
+  Two layers, as Android 8 and later expect: the mark on its own, and the
+  ground it sits on. The launcher masks them into whatever shape the phone
+  uses — circle, squircle, teardrop — so the mark is drawn at 58% of the
+  canvas and stays inside the safe zone in every one of them.
+
+  Both layers are real artwork under mipmap-<dpi>/, cut from the site's own
+  logo (assets/img/icon-512.png), so the app icon and the website are the
+  same mark. The monochrome layer is the simplified "A" — a themed icon is
+  drawn as a flat silhouette, and the full emblem would turn to mud.
+-->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@mipmap/ic_launcher_background"/>
+    <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
+    <monochrome android:drawable="@drawable/ic_launcher_fg"/>
+</adaptive-icon>

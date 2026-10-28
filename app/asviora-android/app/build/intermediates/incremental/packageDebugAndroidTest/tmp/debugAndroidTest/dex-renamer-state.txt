@@ -1,0 +1,7 @@
+#Sun Sep 06 17:54:40 IST 2026
+base.0=D\:\\xamp\\htdocs\\gamesv\\app\\asviora-android\\app\\build\\intermediates\\dex\\debugAndroidTest\\mergeProjectDexDebugAndroidTest\\0\\classes.dex
+base.1=D\:\\xamp\\htdocs\\gamesv\\app\\asviora-android\\app\\build\\intermediates\\dex\\debugAndroidTest\\mergeProjectDexDebugAndroidTest\\8\\classes.dex
+path.0=0/classes.dex
+path.1=8/classes.dex
+renamed.0=classes.dex
+renamed.1=classes2.dex

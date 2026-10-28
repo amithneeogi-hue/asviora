@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The hero card, dressed like the logo: dark metal, a gold glint top-right,
+     a lime glow bottom-left, and a gold rim. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:angle="315"
+                android:startColor="#2A2F1C"
+                android:centerColor="#1C1E1C"
+                android:endColor="#131417" />
+            <corners android:radius="@dimen/radius_hero" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:type="radial"
+                android:gradientRadius="60%p"
+                android:centerX="1.0" android:centerY="0.0"
+                android:startColor="#4DE8BE55"
+                android:centerColor="#14E8BE55"
+                android:endColor="#00000000" />
+            <corners android:radius="@dimen/radius_hero" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:type="radial"
+                android:gradientRadius="55%p"
+                android:centerX="0.0" android:centerY="1.0"
+                android:startColor="#40A6D83E"
+                android:endColor="#00000000" />
+            <corners android:radius="@dimen/radius_hero" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#00000000" />
+            <corners android:radius="@dimen/radius_hero" />
+            <stroke android:width="1.2dp" android:color="#73E8BE55" />
+        </shape>
+    </item>
+</layer-list>

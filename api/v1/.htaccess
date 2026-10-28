@@ -1,0 +1,32 @@
+# Mobile API v1
+#
+# Pretty routes: /api/v1/quiz/levels -> index.php?r=quiz/levels
+# Everything still works without mod_rewrite — index.php?r=... is read
+# first — so a host with rewriting switched off loses nothing but looks.
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # No RewriteBase on purpose: without it the rules stay relative to
+  # whatever folder the site lives in, so /gamesv/api/v1/ on XAMPP and
+  # /api/v1/ on the live domain both work from the same file.
+
+  # Apache with CGI/FastCGI drops the Authorization header unless it is
+  # passed through explicitly. Without this the bearer token vanishes.
+  RewriteCond %{HTTP:Authorization} ^(.+)$
+  RewriteRule .* - [E=HTTP_AUTHORIZATION:%1]
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)$ index.php?r=$1 [QSA,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "no-referrer"
+</IfModule>
+
+# Never serve the bootstrap directly
+<Files "bootstrap.php">
+  Require all denied
+</Files>

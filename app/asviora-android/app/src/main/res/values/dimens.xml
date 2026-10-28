@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="gutter">20dp</dimen>
+    <dimen name="radius_card">22dp</dimen>
+    <dimen name="radius_hero">28dp</dimen>
+    <dimen name="topbar_h">64dp</dimen>
+    <dimen name="icon_btn">44dp</dimen>
+    <!-- room under scrolling content so the floating nav never covers it -->
+    <dimen name="nav_clearance">104dp</dimen>
+</resources>

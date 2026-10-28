@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- ==========================================================
+         App theme — premium dark (v3)
+         ========================================================== -->
+    <style name="Theme.Asviora" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/green</item>
+        <item name="colorOnPrimary">@color/ink</item>
+        <item name="colorPrimaryContainer">@color/green_dark</item>
+        <item name="colorSecondary">@color/gold</item>
+        <item name="colorOnSecondary">@color/ink</item>
+        <item name="colorTertiary">@color/bronze</item>
+        <item name="colorError">@color/danger</item>
+        <item name="android:colorBackground">@color/bg</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/text</item>
+        <item name="colorOnSurfaceVariant">@color/muted</item>
+        <item name="colorOutline">@color/line</item>
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+        <item name="android:windowBackground">@drawable/bg_app</item>
+        <item name="android:textColorHighlight">@color/green_ghost</item>
+        <item name="android:colorControlActivated">@color/green</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:windowAnimationStyle">@style/Anim.Asviora.Screen</item>
+    </style>
+
+    <style name="Theme.Asviora.Splash" parent="Theme.Asviora">
+        <item name="android:windowBackground">@drawable/bg_brand_glow</item>
+        <item name="android:windowAnimationStyle">@style/Anim.Asviora.Fade</item>
+    </style>
+
+    <!-- The game screen goes straight to the board: no slide, a quick fade. -->
+    <style name="Theme.Asviora.Game" parent="Theme.Asviora">
+        <item name="android:windowBackground">@drawable/bg_brand_glow</item>
+        <item name="android:windowAnimationStyle">@style/Anim.Asviora.Fade</item>
+    </style>
+
+    <!-- A custom dialog: no frame of its own, a dimmed scrim behind. -->
+    <style name="Dialog.Asviora" parent="Theme.Material3.Dark.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.72</item>
+        <item name="android:windowAnimationStyle">@style/Anim.Asviora.Dialog</item>
+        <item name="android:windowMinWidthMajor">88%</item>
+        <item name="android:windowMinWidthMinor">88%</item>
+    </style>
+
+    <!-- ==========================================================
+         Motion
+         ========================================================== -->
+    <style name="Anim.Asviora.Screen" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/screen_in</item>
+        <item name="android:activityOpenExitAnimation">@anim/screen_out</item>
+        <item name="android:activityCloseEnterAnimation">@anim/screen_back_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/screen_back_out</item>
+    </style>
+
+    <style name="Anim.Asviora.Fade" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@android:anim/fade_in</item>
+        <item name="android:activityOpenExitAnimation">@android:anim/fade_out</item>
+        <item name="android:activityCloseEnterAnimation">@android:anim/fade_in</item>
+        <item name="android:activityCloseExitAnimation">@android:anim/fade_out</item>
+    </style>
+
+    <style name="Anim.Asviora.Dialog" parent="@android:style/Animation.Dialog">
+        <item name="android:windowEnterAnimation">@anim/tab_in</item>
+        <item name="android:windowExitAnimation">@anim/tab_out</item>
+    </style>
+
+    <!-- ==========================================================
+         Surfaces
+         ========================================================== -->
+    <style name="Card">
+        <item name="android:background">@drawable/bg_card</item>
+        <item name="android:padding">18dp</item>
+    </style>
+
+    <!-- A card you can tap: ripple, and it gives under the finger. -->
+    <style name="Card.Press">
+        <item name="android:background">@drawable/bg_card_press</item>
+        <item name="android:stateListAnimator">@animator/press_scale</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="Card.Hero">
+        <item name="android:background">@drawable/bg_card_hero</item>
+        <item name="android:padding">22dp</item>
+        <item name="android:elevation">10dp</item>
+    </style>
+
+    <!-- Round glass icon button used in every top bar. -->
+    <style name="IconButton">
+        <item name="android:layout_width">@dimen/icon_btn</item>
+        <item name="android:layout_height">@dimen/icon_btn</item>
+        <item name="android:background">@drawable/bg_icon_btn</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:stateListAnimator">@animator/press_scale</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="Chip">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingLeft">11dp</item>
+        <item name="android:paddingRight">11dp</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.06</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:drawablePadding">5dp</item>
+    </style>
+
+    <style name="Chip.Gold">
+        <item name="android:background">@drawable/bg_pill</item>
+        <item name="android:textColor">@color/gold_bright</item>
+    </style>
+
+    <style name="Chip.Green">
+        <item name="android:background">@drawable/bg_pill_green</item>
+        <item name="android:textColor">@color/green_bright</item>
+    </style>
+
+    <style name="Chip.Glass">
+        <item name="android:background">@drawable/bg_pill_glass</item>
+        <item name="android:textColor">@color/text</item>
+    </style>
+
+    <!-- ==========================================================
+         Type
+         ========================================================== -->
+    <style name="Display">
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:fontFamily">sans-serif-black</item>
+        <item name="android:letterSpacing">-0.02</item>
+    </style>
+
+    <style name="H1">
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:fontFamily">sans-serif-black</item>
+        <item name="android:letterSpacing">-0.015</item>
+    </style>
+
+    <style name="H2">
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Muted">
+        <item name="android:textColor">@color/muted</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:lineSpacingExtra">2dp</item>
+    </style>
+
+    <style name="Label">
+        <item name="android:textColor">@color/dim</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.16</item>
+    </style>
+
+    <style name="Stat">
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:fontFamily">sans-serif-black</item>
+        <item name="android:letterSpacing">-0.02</item>
+    </style>
+
+    <style name="TopTitle">
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">sans-serif-black</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <!-- ==========================================================
+         Controls
+         ========================================================== -->
+    <style name="Primary" parent="Widget.Material3.Button">
+        <item name="android:background">@drawable/btn_primary</item>
+        <item name="backgroundTint">@null</item>
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:fontFamily">sans-serif-black</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:letterSpacing">0.03</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:paddingLeft">26dp</item>
+        <item name="android:paddingRight">26dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:stateListAnimator">@animator/press_scale</item>
+        <item name="android:elevation">0dp</item>
+    </style>
+
+    <style name="Primary.Gold">
+        <item name="android:background">@drawable/btn_gold</item>
+    </style>
+
+    <style name="Ghost" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:background">@drawable/btn_ghost</item>
+        <item name="backgroundTint">@null</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="android:paddingLeft">22dp</item>
+        <item name="android:paddingRight">22dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:stateListAnimator">@animator/press_scale</item>
+    </style>
+
+    <style name="Ghost.Danger">
+        <item name="android:background">@drawable/btn_danger</item>
+        <item name="android:textColor">@color/danger</item>
+    </style>
+
+    <style name="Field">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:background">@drawable/bg_field</item>
+        <item name="android:paddingLeft">18dp</item>
+        <item name="android:paddingRight">18dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:textColor">@color/text</item>
+        <item name="android:textColorHint">@color/dim</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <!-- The pill behind the selected tab icon. -->
+    <style name="NavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/green_ghost</item>
+        <item name="android:width">60dp</item>
+        <item name="android:height">32dp</item>
+    </style>
+
+    <style name="NavLabel" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:textSize">11sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>

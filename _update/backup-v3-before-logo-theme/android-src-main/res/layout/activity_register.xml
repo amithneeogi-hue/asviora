@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@drawable/bg_brand_glow"
+    android:fillViewport="true" android:scrollbars="none">
+
+    <LinearLayout android:id="@+id/authRoot"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:gravity="center_horizontal"
+        android:padding="24dp">
+
+        <ImageView android:id="@+id/logo"
+            android:layout_width="84dp" android:layout_height="84dp"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/logo_mark"
+            android:contentDescription="@string/app_name" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="10dp" android:text="@string/register" style="@style/Display" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Free, and the welcome coins land straight away."
+            android:drawableStart="@drawable/ic_coin_sm" android:drawablePadding="6dp"
+            android:gravity="center_vertical"
+            style="@style/Muted" android:layout_marginTop="4dp" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:layout_marginTop="22dp"
+            style="@style/Card" android:padding="20dp">
+
+            <EditText android:id="@+id/name" style="@style/Field"
+                android:hint="Your name"
+                android:inputType="textPersonName" android:autofillHints="name" />
+
+            <EditText android:id="@+id/username" style="@style/Field"
+                android:layout_marginTop="12dp"
+                android:hint="Username" android:inputType="text"
+                android:autofillHints="username" />
+
+            <EditText android:id="@+id/email" style="@style/Field"
+                android:layout_marginTop="12dp"
+                android:hint="Email" android:inputType="textEmailAddress"
+                android:autofillHints="emailAddress" />
+
+            <EditText android:id="@+id/password" style="@style/Field"
+                android:layout_marginTop="12dp"
+                android:hint="Password" android:inputType="textPassword"
+                android:autofillHints="newPassword" />
+
+            <EditText android:id="@+id/referral" style="@style/Field"
+                android:layout_marginTop="12dp"
+                android:hint="Referral code (optional)" android:inputType="textCapCharacters" />
+
+            <TextView android:id="@+id/error" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:layout_marginTop="12dp"
+                android:visibility="gone" android:textColor="@color/danger" android:textSize="13sp" />
+
+            <Button android:id="@+id/submit" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:layout_marginTop="20dp"
+                android:text="@string/register" style="@style/Primary" />
+        </LinearLayout>
+
+        <Button android:id="@+id/toLogin" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="16dp"
+            android:layout_marginBottom="12dp"
+            android:text="I already have an account" style="@style/Ghost" />
+    </LinearLayout>
+</ScrollView>

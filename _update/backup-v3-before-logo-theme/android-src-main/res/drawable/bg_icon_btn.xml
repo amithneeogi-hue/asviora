@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Round glass button for the top bars (back, restart, full screen). -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#409BE15D">
+    <item>
+        <shape android:shape="oval">
+            <gradient android:angle="270"
+                android:startColor="#29FFFFFF"
+                android:endColor="#0DFFFFFF" />
+            <stroke android:width="1dp" android:color="#2EFFFFFF" />
+        </shape>
+    </item>
+</ripple>

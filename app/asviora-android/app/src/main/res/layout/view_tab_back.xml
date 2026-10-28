@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  v4 — the back button at the top of every tab except Home.
+  android:onClick resolves to MainActivity.onTabBack(), which goes Home.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tabBack"
+    android:layout_width="wrap_content" android:layout_height="wrap_content"
+    android:orientation="horizontal" android:gravity="center_vertical"
+    android:layout_marginBottom="10dp"
+    android:paddingEnd="12dp"
+    android:background="@drawable/bg_pill_glass"
+    android:clickable="true" android:focusable="true"
+    android:stateListAnimator="@animator/press_scale"
+    android:onClick="onTabBack"
+    android:contentDescription="@string/back">
+
+    <ImageView
+        android:layout_width="34dp" android:layout_height="34dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_back"
+        android:importantForAccessibility="no" />
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:textColor="@color/text" android:textSize="13sp" android:textStyle="bold"
+        android:text="@string/home" />
+</LinearLayout>

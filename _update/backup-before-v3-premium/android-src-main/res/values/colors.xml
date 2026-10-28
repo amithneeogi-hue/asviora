@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The palette, taken from the website's dark theme so the app and the site
+  obviously belong to each other.
+
+  Everything is built from three grounds and two accents. The grounds go
+  bg -> bg2 -> surface as things come forward; green is what you can act on
+  and gold is what you have won. Nothing else earns a colour: a screen that
+  paints coins gold, buttons green and everything else in the grounds reads
+  as one product, and a fourth accent would only blur that.
+-->
+<resources>
+    <!-- grounds, back to front -->
+    <color name="bg">#080B11</color>
+    <color name="bg2">#0F141C</color>
+    <color name="surface">#151B25</color>
+    <color name="surface2">#1C2431</color>
+
+    <!-- lines -->
+    <color name="line">#28313F</color>
+    <color name="line_soft">#1B2431</color>
+
+    <!-- type -->
+    <color name="text">#E7EDF6</color>
+    <color name="muted">#8E9AAC</color>
+    <color name="dim">#63707F</color>
+
+    <!-- accents -->
+    <color name="green">#8FCE3F</color>
+    <color name="green_bright">#A7E052</color>
+    <color name="green_dark">#4A7616</color>
+    <color name="green_ghost">#1A8FCE3F</color>
+
+    <color name="gold">#E5B84B</color>
+    <color name="gold_dark">#8A6A16</color>
+    <color name="gold_ghost">#1AE5B84B</color>
+
+    <color name="cyan">#56B0F0</color>
+    <color name="danger">#F2637E</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <!-- the icon's own ground, so the splash and the launcher match -->
+    <color name="icon_bg">#0D1118</color>
+</resources>

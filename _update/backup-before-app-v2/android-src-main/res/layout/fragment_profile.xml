@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/bg">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="18dp">
+
+        <TextView android:id="@+id/name" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" style="@style/H1"
+            android:layout_marginTop="14dp" />
+
+        <TextView android:id="@+id/handle" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" style="@style/Muted" />
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:layout_marginTop="16dp"
+            style="@style/Card">
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:id="@+id/coins" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:textSize="22sp"
+                    android:textStyle="bold" android:textColor="@color/gold" android:text="0" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    style="@style/Muted" android:text="Coins" />
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:id="@+id/rounds" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:textSize="22sp"
+                    android:textStyle="bold" android:textColor="@color/text" android:text="0" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    style="@style/Muted" android:text="Rounds" />
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:orientation="vertical">
+                <TextView android:id="@+id/levelsPassed" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:textSize="22sp"
+                    android:textStyle="bold" android:textColor="@color/green" android:text="0" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    style="@style/Muted" android:text="Levels" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:layout_marginTop="10dp">
+            <TextView android:id="@+id/level" android:layout_width="0dp"
+                android:layout_height="wrap_content" android:layout_weight="1"
+                style="@style/Muted" android:text="Level 1" />
+            <TextView android:id="@+id/best" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" style="@style/Muted" android:text="0" />
+        </LinearLayout>
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            style="@style/H2" android:layout_marginTop="22dp" android:text="Recent rounds" />
+        <LinearLayout android:id="@+id/recent" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="vertical"
+            android:layout_marginTop="8dp" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            style="@style/H2" android:layout_marginTop="22dp" android:text="Coin history" />
+        <LinearLayout android:id="@+id/wallet" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="vertical"
+            android:layout_marginTop="8dp" />
+
+        <Button android:id="@+id/logout" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="26dp"
+            android:text="@string/logout" style="@style/Ghost" />
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Splash / game-loading ground: midnight with a bright centre halo. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/bg_app" />
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="55%p"
+                android:centerX="0.5" android:centerY="0.42"
+                android:startColor="#3D9BE15D"
+                android:centerColor="#148B5CF6"
+                android:endColor="#00000000" />
+        </shape>
+    </item>
+</layer-list>
