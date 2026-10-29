@@ -100,6 +100,8 @@ require __DIR__ . '/includes/header.php';
         </div>
       </div>
       <div class="row" style="gap:9px">
+        <a href="<?= url('games.php') ?>" class="btn btn-ghost btn-sm" id="backBtn"
+           onclick="if(!confirm('Are you sure you want to exit the game?')){return false;}try{if(document.referrer&&new URL(document.referrer).host===location.host&&history.length>1){history.back();return false;}}catch(e){}">&#8592; Back</a>
         <button class="btn btn-ghost btn-sm" id="fsToggle">&#9974; Fullscreen</button>
         <a href="<?= url('leaderboard.php?game=' . urlencode($game['slug'])) ?>"
            class="btn btn-ghost btn-sm">&#127942; Leaderboard</a>
