@@ -25,11 +25,14 @@ if (!$game) {
 require_game_access($game['slug']);
 
 $page_title = $game['title'] . ' — Play Online';
-$page_desc  = trim(($game['tagline'] ? rtrim($game['tagline'], '. ') . '. ' : '')
-            . html_entity_decode(excerpt($game['description'], 150), ENT_QUOTES, 'UTF-8'));
+$descLead   = $game['tagline'] ? rtrim($game['tagline'], '. ') . '. ' : '';
+$page_desc  = trim($descLead
+            . html_entity_decode(excerpt($game['description'],
+                max(40, 155 - mb_strlen($descLead))), ENT_QUOTES, 'UTF-8'));
 
 // v7 SEO
 $seo_key   = 'game:' . $game['slug'];
+$seo_keywords = seo_default_meta($seo_key)['keywords'];
 $gameThumb = (string) game_thumb($game['slug'], $game['thumbnail']);
 $seo_image  = $gameThumb;
 $seo_crumbs = ['Games' => url('games.php'),

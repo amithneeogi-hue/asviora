@@ -5,8 +5,9 @@ if (is_logged_in()) {
     redirect('dashboard.php');
 }
 
-$page_title = 'Log In';
+$page_title = 'Log In to Play Skill Games';
 $page_desc  = 'Log in to ' . setting('site_name', 'Asviora Games') . ' to play skill games, quizzes and chess, and track your coins, XP and rank.';
+$seo_keywords = 'play skill games, asviora games login, quiz login, chess login, sudoku login, account login';
 $errors = [];
 $ident  = '';
 

@@ -45,6 +45,18 @@ function analytics_geo_mode(): string
     return in_array($m, ['off', 'header', 'auto'], true) ? $m : 'auto';
 }
 
+/** Leave 404s and asset requests (favicon, robots, images, CSS/JS) out of the log. */
+function analytics_ignore_noise(): bool
+{
+    return setting('analytics_ignore_404', '1') === '1';
+}
+
+/** Leave traffic from known cloud / hosting / proxy providers out of the log. */
+function analytics_ignore_datacenter(): bool
+{
+    return setting('analytics_ignore_datacenter', '1') === '1';
+}
+
 /**
  * The salt behind the visitor hash. Generated once and stored, so the
  * same device keeps the same key — but the raw IP can never be worked
@@ -61,14 +73,98 @@ function analytics_salt(): string
 }
 
 // ---------------------------------------------------------------
+// Noise filters
+// ---------------------------------------------------------------
+
+/**
+ * Is this request a real page, or just an asset / probe / 404?
+ *
+ * Analytics used to count /favicon.ico, /.well-known/assetlinks.json and
+ * hundreds of WordPress / .env scans as "visitors", which made the country
+ * report look like the site had a global audience of bots.
+ */
+function analytics_is_noise_path(string $path): bool
+{
+    $p = '/' . ltrim(strtolower($path), '/');
+
+    if ($p === '/') {
+        return false;
+    }
+
+    $exact = [
+        '/favicon.ico', '/robots.txt', '/sitemap.xml', '/sitemap_index.xml',
+        '/apple-touch-icon.png', '/apple-touch-icon-precomposed.png',
+        '/browserconfig.xml', '/site.webmanifest', '/manifest.json',
+        '/ads.txt', '/security.txt', '/xmlrpc.php',
+    ];
+    if (in_array($p, $exact, true)) {
+        return true;
+    }
+    if (str_starts_with($p, '/.well-known/')) {
+        return true;
+    }
+    if (preg_match('#^/(wp-admin|wp-login|wp-content|wp-includes|wp-json|cgi-bin|phpmyadmin|pma|myadmin|adminer)(/|\.|$)#', $p)) {
+        return true;
+    }
+    foreach (['/assets/', '/uploads/', '/games/', '/storage/', '/api/', '/admin/'] as $pre) {
+        if (str_starts_with($p, $pre)) {
+            return true;
+        }
+    }
+    if (preg_match('/\.(ico|css|js|mjs|json|png|jpe?g|gif|webp|svg|bmp|woff2?|ttf|eot|otf|map|txt|xml|sql|env|bak|old|zip|gz|rar|pdf)$/i', $p)) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Does this ISP look like a cloud / hosting / proxy provider rather than a
+ * normal home or mobile connection? Those addresses are overwhelmingly
+ * crawlers, scanners, uptime monitors and bots.
+ */
+function isp_is_datacenter(?string $isp): bool
+{
+    $s = strtolower(trim((string) $isp));
+    if ($s === '') {
+        return false;
+    }
+    return (bool) preg_match(
+        '/amazon|aws|digitalocean|google|microsoft|azure|cloudflare|ovh|hetzner|'
+        . 'leaseweb|akamai|fastly|scaleway|zenlayer|layerswitch|colocation|'
+        . 'hostroyale|quickpacket|egihosting|logicweb|b2 net|ip-only|'
+        . 'internet viking|glesys|portlane|netcup|ultahost|dogado|contabo|'
+        . 'linode|vultr|oracle cloud|alibaba|tencent|m247|psychz|choopa|'
+        . 'frantech|buyvm|hosthatch|hostinger|godaddy|namecheap|ionos|strato|'
+        . 'serverhub|quadranet|sharktech|fiberpower|bl networks|hivelocity|'
+        . 'onyphe|3xk tech|ace data centers|cogent|ntt america|zscaler|'
+        . 'facebook, inc|active search internet|acuit|korte|gsys|bolaget|'
+        . 'packet|hosting|data ?cent(er|re)|vpn|proxy/i',
+        $s
+    );
+}
+
+// ---------------------------------------------------------------
 // The visitor
 // ---------------------------------------------------------------
 
-/** The real client IP, looking through the usual proxy headers. */
+/**
+ * The real client IP.
+ *
+ * REMOTE_ADDR is the only value the client cannot fake. Proxy/CDN headers
+ * are trusted only when the admin explicitly says the site sits behind one
+ * (Admin -> Visitors -> Trust proxy headers), because otherwise any bot can
+ * send an X-Forwarded-For of its choosing and invent a country.
+ */
 function visitor_ip(): string
 {
+    $remote = substr((string) ($_SERVER['REMOTE_ADDR'] ?? ''), 0, 45);
+
+    if (setting('analytics_trust_proxy', '0') !== '1') {
+        return $remote;
+    }
+
     $keys = ['HTTP_CF_CONNECTING_IP', 'HTTP_TRUE_CLIENT_IP',
-             'HTTP_X_REAL_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR'];
+             'HTTP_X_REAL_IP', 'HTTP_X_FORWARDED_FOR'];
 
     foreach ($keys as $k) {
         if (empty($_SERVER[$k])) {
@@ -82,7 +178,7 @@ function visitor_ip(): string
             }
         }
     }
-    return substr((string) ($_SERVER['REMOTE_ADDR'] ?? ''), 0, 45);
+    return $remote;
 }
 
 /** Is this a LAN / loopback address? Those can never be geolocated. */
@@ -116,7 +212,14 @@ function visitor_agent(): array
     $bot = ($ua === '') || (bool) preg_match(
         '/bot|crawl|spider|slurp|bingpreview|facebookexternalhit|whatsapp|telegram|'
         . 'headless|lighthouse|pingdom|uptime|monitor|curl|wget|python-requests|axios|'
-        . 'go-http|java\/|scrapy|semrush|ahrefs|mj12|dotbot|petalbot|yandex|duckduck/i', $ua);
+        . 'go-http|java\/|scrapy|semrush|ahrefs|mj12|dotbot|petalbot|yandex|duckduck|'
+        . 'googleother|google-inspectiontool|google-read-aloud|adsbot|mediapartners|'
+        . 'feedfetcher|apis-google|google-site-verification|pagespeed|gtmetrix|'
+        . 'site24x7|statuscake|newrelic|datadog|uptimerobot|hetrix|freshping|'
+        . 'phantomjs|puppeteer|playwright|selenium|headlesschrome|'
+        . 'facebookcatalog|linkedinbot|twitterbot|pinterestbot|applebot|'
+        . 'discordbot|embedly|outbrain|masscan|nmap|nikto|sqlmap|zmeu|zgrab|'
+        . 'nuclei|censys|shodan|internetmeasurement|binaryedge|expanse/i', $ua);
 
     if ($bot) {
         $device = 'bot';
@@ -269,8 +372,36 @@ function geo_api_lookup(string $ip): ?array
     ];
 }
 
+/** True when a location has a region and a city, not just a country. */
+function geo_has_detail(?array $g): bool
+{
+    return $g !== null
+        && trim((string) ($g['region'] ?? '')) !== ''
+        && trim((string) ($g['city'] ?? '')) !== '';
+}
+
+/** Fill gaps in $base with non-empty values from $extra. */
+function geo_merge(array $base, array $extra): array
+{
+    foreach (['country_code', 'country', 'region', 'city', 'isp'] as $k) {
+        if (trim((string) ($extra[$k] ?? '')) !== '') {
+            $base[$k] = $extra[$k];
+        }
+    }
+    if (!empty($extra['source'])) {
+        $base['source'] = $base['source'] !== $extra['source']
+            ? 'header+api' : $extra['source'];
+    }
+    return $base;
+}
+
 /**
  * Best location we can get for an address without stalling the page.
+ *
+ * A CDN usually sends only the country (Cloudflare's CF-IPCountry, for
+ * example), so a header result alone is not enough in "auto" mode: the
+ * IP lookup is still tried once to fill region and city, and the header
+ * values win where both know the answer.
  *
  * @param bool $allowApi false on the hot path once one call has already
  *                       been made this request.
@@ -283,34 +414,64 @@ function geo_for_ip(string $ip, bool $allowApi = true): ?array
     }
 
     $h = geo_from_headers();
-    if ($h !== null) {
-        geo_cache_put($ip, $h);
-        return $h;
-    }
+
+    // Header-only mode is deliberately country-only and never calls out.
     if ($mode === 'header') {
-        return null;
+        if ($h !== null) {
+            geo_cache_put($ip, $h);
+        }
+        return $h;
     }
 
     $c = geo_cached($ip);
-    if ($c !== null) {
+
+    // A full header result (paid Cloudflare plans and some hosts) is best.
+    if ($h !== null && geo_has_detail($h)) {
+        geo_cache_put($ip, $h);
+        return $h;
+    }
+
+    // A cached full result needs no lookup; refresh the country from the
+    // header if one is available.
+    if ($c !== null && geo_has_detail($c)) {
+        if ($h !== null) {
+            $c = geo_merge($c, $h);
+            geo_cache_put($ip, $c);
+        }
         return $c;
     }
 
+    $base = $h ?? $c;
+
     if (ip_is_private($ip)) {
-        geo_cache_put($ip, ['country_code' => null, 'country' => 'Local network',
-                            'region' => null, 'city' => null, 'source' => 'local']);
-        return null;
+        if ($base === null) {
+            $base = ['country_code' => null, 'country' => 'Local network',
+                     'region' => null, 'city' => null, 'source' => 'local'];
+        }
+        geo_cache_put($ip, $base);
+        return (($base['country'] ?? '') === 'Local network') ? null : $base;
     }
 
+    // Auto mode: ask the IP lookup for the missing region/city.
     if (!$allowApi) {
-        return null;
+        return $base;
     }
 
     $g = geo_api_lookup($ip);
     if ($g !== null) {
+        if ($h !== null) {
+            $g = geo_merge($g, $h);
+        } elseif ($c !== null) {
+            $g = geo_merge($g, $c);
+        }
         geo_cache_put($ip, $g);
+        return $g;
     }
-    return $g;
+
+    if ($base !== null) {
+        geo_cache_put($ip, $base);
+    }
+    return $base;
 }
 
 // ---------------------------------------------------------------
@@ -334,6 +495,26 @@ function track_visit(?string $pageTitle = null): void
     $done = true;
 
     try {
+        // Only real GET page views. HEAD probes, POSTs and asset requests
+        // are not visitors.
+        if (strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')) !== 'GET') {
+            return;
+        }
+
+        $page = mb_substr((string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH), 0, 190);
+        if ($page === '') {
+            $page = '/';
+        }
+
+        if (analytics_ignore_noise()) {
+            if (http_response_code() === 404) {
+                return;
+            }
+            if (analytics_is_noise_path($page)) {
+                return;
+            }
+        }
+
         $agent = visitor_agent();
 
         if ($agent['is_bot'] && setting('analytics_ignore_bots', '1') === '1') {
@@ -343,11 +524,15 @@ function track_visit(?string $pageTitle = null): void
             return;
         }
 
-        $ip   = visitor_ip();
-        $key  = visitor_key();
-        $page = mb_substr((string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH), 0, 190);
-        if ($page === '') {
-            $page = '/';
+        $ip  = visitor_ip();
+        $key = visitor_key();
+
+        // Cheap early exit when the ISP is already cached.
+        if (analytics_ignore_datacenter()) {
+            $cached = geo_cached($ip);
+            if ($cached !== null && isp_is_datacenter($cached['isp'] ?? null)) {
+                return;
+            }
         }
 
         // fold refreshes of the same page together
@@ -376,7 +561,14 @@ function track_visit(?string $pageTitle = null): void
             'SELECT 1 FROM visits WHERE visitor_key = ? AND visit_date = CURDATE() LIMIT 1',
             [$key], 0);
 
-        $geo   = geo_for_ip($ip, true);
+        $geo = geo_for_ip($ip, true);
+
+        // A fresh lookup may now tell us this is a cloud/hosting address.
+        if (analytics_ignore_datacenter() && $geo !== null
+            && isp_is_datacenter($geo['isp'] ?? null)) {
+            return;
+        }
+
         $state = $geo ? 'done' : (ip_is_private($ip) || analytics_geo_mode() === 'off'
                                   ? 'skipped' : 'pending');
 
@@ -467,23 +659,34 @@ function visit_rollup_bump(string $day, ?string $cc, bool $firstToday, bool $isM
  */
 function resolve_pending_geo(int $limit = 25): int
 {
-    if (!analytics_on() || analytics_geo_mode() === 'off') {
+    // "Header only" promises no outside calls, so only auto mode may look up.
+    if (!analytics_on() || analytics_geo_mode() !== 'auto') {
         return 0;
     }
 
+    // Include older rows that got a country from a CDN header but never got
+    // a region/city, which is the usual Cloudflare case.
     $ips = fetch_all(
         'SELECT ip_address, COUNT(*) AS n FROM visits
-          WHERE geo_state = "pending" AND ip_address IS NOT NULL
+          WHERE ip_address IS NOT NULL
+            AND (geo_state = "pending"
+                 OR (geo_state = "done"
+                     AND country_code IS NOT NULL
+                     AND COALESCE(country, "") <> "Local network"
+                     AND (region IS NULL OR region = "" OR city IS NULL OR city = "")))
           GROUP BY ip_address ORDER BY n DESC LIMIT ' . max(1, min(100, $limit)));
 
     $fixed = 0;
     foreach ($ips as $r) {
-        $ip = (string) $r['ip_address'];
+        $ip     = (string) $r['ip_address'];
+        $cached = geo_cached($ip);
+        $g      = $cached;
 
-        $g = geo_cached($ip);
-        if ($g === null) {
-            $g = geo_api_lookup($ip);
-            if ($g !== null) {
+        // A cached country-only row is not enough - ask for the detail too.
+        if ($g === null || !geo_has_detail($g)) {
+            $api = geo_api_lookup($ip);
+            if ($api !== null) {
+                $g = $cached !== null ? geo_merge($api, $cached) : $api;
                 geo_cache_put($ip, $g);
             }
         }
@@ -497,7 +700,10 @@ function resolve_pending_geo(int $limit = 25): int
         $fixed += q(
             'UPDATE visits SET country_code = ?, country = ?, region = ?, city = ?,
                     geo_state = "done"
-              WHERE ip_address = ? AND geo_state = "pending"',
+              WHERE ip_address = ?
+                AND (geo_state = "pending"
+                     OR (geo_state = "done"
+                         AND (region IS NULL OR region = "" OR city IS NULL OR city = "")))',
             [$g['country_code'], $g['country'], $g['region'], $g['city'], $ip])->rowCount();
 
         usleep(150000);          // stay well inside the free rate limit
@@ -715,13 +921,22 @@ function visits_recent(int $limit = 25): array
           ORDER BY v.id DESC LIMIT ' . max(1, min(200, $limit)));
 }
 
-/** How many views are still waiting on a location lookup. */
+/**
+ * How many views still need location work: either no lookup at all, or a
+ * country from a CDN header with no region/city.
+ */
 function visits_pending_geo(): int
 {
     if (!has_table('visits')) {
         return 0;
     }
-    return (int) fetch_col('SELECT COUNT(*) FROM visits WHERE geo_state = "pending"', [], 0);
+    return (int) fetch_col(
+        'SELECT COUNT(*) FROM visits
+          WHERE geo_state = "pending"
+             OR (geo_state = "done"
+                 AND country_code IS NOT NULL
+                 AND COALESCE(country, "") <> "Local network"
+                 AND (region IS NULL OR region = "" OR city IS NULL OR city = ""))', [], 0);
 }
 
 /** A flag emoji from a two-letter country code. */

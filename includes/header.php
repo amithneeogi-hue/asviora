@@ -13,28 +13,30 @@ $u      = current_user();
 
 // v7 — title, description, canonical, robots, Open Graph and structured
 // data all come from the SEO manager (includes/seo.php). Pages keep
-// setting $page_title / $page_desc as before; $seo_key, $seo_image,
-// $seo_type, $seo_schema, $seo_crumbs and $seo_noindex are optional extras.
+// setting $page_title / $page_desc as before; $seo_key, $seo_keywords,
+// $seo_image, $seo_type, $seo_schema, $seo_crumbs and $seo_noindex are
+// optional extras.
 $seo = seo_resolve([
-  'key'     => $seo_key ?? null,
-  'title'   => $page_title ?? '',
-  'desc'    => $page_desc ?? '',
-  'image'   => $seo_image ?? '',
-  'type'    => $seo_type ?? null,
-  'schema'  => $seo_schema ?? [],
-  'crumbs'  => $seo_crumbs ?? null,
-  'noindex' => !empty($seo_noindex),
+  'key'      => $seo_key ?? null,
+  'title'    => $page_title ?? '',
+  'desc'     => $page_desc ?? '',
+  'keywords' => $seo_keywords ?? '',
+  'image'    => $seo_image ?? '',
+  'type'     => $seo_type ?? null,
+  'schema'   => $seo_schema ?? [],
+  'crumbs'   => $seo_crumbs ?? null,
+  'noindex'  => !empty($seo_noindex),
 ]);
 $logo = logo_url();
 
 // contact + social, all editable from Admin > Site Settings
 $cEmail = setting('contact_email');
-$cPhone = setting('contact_phone');
-$sFb    = setting('social_facebook');
-$sIg    = setting('social_instagram');
-$sYt    = setting('social_youtube');
-$sWa    = setting('social_whatsapp');
-$sTw    = setting('social_twitter');
+$cPhone = contact_phone_public();
+$sFb    = social_url('social_facebook');
+$sIg    = social_url('social_instagram');
+$sYt    = social_url('social_youtube');
+$sWa    = social_url('social_whatsapp');
+$sTw    = social_url('social_twitter');
 $hasTop = $cEmail || $cPhone || $sFb || $sIg || $sYt || $sWa || $sTw;
 
 $navQuiz = quiz_on();

@@ -128,6 +128,35 @@ function setting(string $key, string $default = ''): string
     return $v === '' ? $default : $v;
 }
 
+/** Public phone number, or '' when the admin left an obvious placeholder. */
+function contact_phone_public(): string
+{
+    $phone = trim(setting('contact_phone'));
+    return ($phone !== '' && !preg_match('/0{6,}/', $phone)) ? $phone : '';
+}
+
+/**
+ * A social profile URL, or '' if it is invalid or just a copy of a
+ * higher-priority network (a common copy/paste mistake).
+ */
+function social_url(string $key): string
+{
+    $url = trim(setting($key));
+    if ($url === '' || filter_var($url, FILTER_VALIDATE_URL) === false) {
+        return '';
+    }
+    foreach (['social_facebook', 'social_instagram', 'social_youtube',
+              'social_twitter', 'social_whatsapp'] as $other) {
+        if ($other === $key) {
+            break;
+        }
+        if (trim(setting($other)) === $url) {
+            return '';
+        }
+    }
+    return $url;
+}
+
 /** Save a setting. */
 function set_setting(string $key, string $value): void
 {

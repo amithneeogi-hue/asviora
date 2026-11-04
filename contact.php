@@ -1,8 +1,10 @@
 <?php
 require_once __DIR__ . '/config/config.php';
 
-$page_title = 'Contact Us';
-$page_desc  = 'Get in touch with the Asviora Games team by email, Facebook or Instagram.';
+$page_title = 'Contact Asviora Games';
+$page_desc  = 'Get in touch with the Asviora Games team by email, Facebook or Instagram for support, suggestions or partnership queries. We reply within one business day.';
+$seo_keywords = 'contact asviora games, customer support, game support, feedback, partnership, help';
+$phonePublic  = contact_phone_public();
 
 $errors = [];
 $sent   = false;
@@ -142,9 +144,9 @@ require __DIR__ . '/includes/header.php';
             <div class="kv"><span class="k">Email</span>
               <span class="v"><a href="mailto:<?= e(setting('contact_email')) ?>"><?= e(setting('contact_email')) ?></a></span></div>
           <?php endif; ?>
-          <?php if (setting('contact_phone')): ?>
+          <?php if ($phonePublic): ?>
             <div class="kv"><span class="k">Phone</span>
-              <span class="v"><a href="tel:<?= e(preg_replace('/\s+/', '', setting('contact_phone'))) ?>"><?= e(setting('contact_phone')) ?></a></span></div>
+              <span class="v"><a href="tel:<?= e(preg_replace('/\s+/', '', $phonePublic)) ?>"><?= e($phonePublic) ?></a></span></div>
           <?php endif; ?>
           <?php if (setting('contact_address')): ?>
             <div class="kv"><span class="k">Location</span>

@@ -40,6 +40,7 @@ $cover = cover_url($post['cover_image']);
 
 // v7 SEO — the post's own key, cover as the share image, and Article data
 $seo_key    = 'post:' . $post['slug'];
+$seo_keywords = seo_default_meta($seo_key)['keywords'];
 $seo_type   = 'article';
 $seo_image  = $cover ?: '';
 $seo_crumbs = ['Blog' => url('blog.php'), $post['title'] => url('post.php?slug=' . urlencode($post['slug']))];

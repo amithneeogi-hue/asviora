@@ -2,12 +2,13 @@
 /**
  * Public site footer.
  */
-$fbUrl   = setting('social_facebook');
-$igUrl   = setting('social_instagram');
-$ytUrl   = setting('social_youtube');
-$waUrl   = setting('social_whatsapp');
-$twUrl   = setting('social_twitter');
+$fbUrl   = social_url('social_facebook');
+$igUrl   = social_url('social_instagram');
+$ytUrl   = social_url('social_youtube');
+$waUrl   = social_url('social_whatsapp');
+$twUrl   = social_url('social_twitter');
 $siteNm  = setting('site_name', 'Asviora Games');
+$phone   = contact_phone_public();
 // everything playable — the three games plus the quiz and the spin
 $footGames = array_slice(arena_items(), 0, 6);
 ?>
@@ -98,9 +99,9 @@ $footGames = array_slice(arena_items(), 0, 6);
           <li><span class="ci">&#9993;</span>
             <a href="mailto:<?= e(setting('contact_email')) ?>"><?= e(setting('contact_email')) ?></a></li>
           <?php endif; ?>
-          <?php if (setting('contact_phone')): ?>
+          <?php if ($phone): ?>
           <li><span class="ci">&#9742;</span>
-            <a href="tel:<?= e(preg_replace('/\s+/', '', setting('contact_phone'))) ?>"><?= e(setting('contact_phone')) ?></a></li>
+            <a href="tel:<?= e(preg_replace('/\s+/', '', $phone)) ?>"><?= e($phone) ?></a></li>
           <?php endif; ?>
           <?php if (setting('contact_address')): ?>
           <li><span class="ci">&#128205;</span><span><?= e(setting('contact_address')) ?></span></li>

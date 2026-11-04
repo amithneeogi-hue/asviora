@@ -33,6 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_ok()) {
         set_setting('analytics_enabled',        empty($_POST['analytics_enabled']) ? '0' : '1');
         set_setting('analytics_ignore_admin',   empty($_POST['ignore_admin']) ? '0' : '1');
         set_setting('analytics_ignore_bots',    empty($_POST['ignore_bots']) ? '0' : '1');
+        set_setting('analytics_ignore_404',     empty($_POST['ignore_404']) ? '0' : '1');
+        set_setting('analytics_ignore_datacenter', empty($_POST['ignore_datacenter']) ? '0' : '1');
+        set_setting('analytics_trust_proxy',    empty($_POST['trust_proxy']) ? '0' : '1');
         $mode = post('geo_mode');
         set_setting('analytics_geo_mode',
                     in_array($mode, ['off', 'header', 'auto'], true) ? $mode : 'auto');
@@ -130,12 +133,14 @@ require __DIR__ . '/includes/layout.php';
   <div class="adm-panel-head">
     <div><h2>Views per day</h2>
       <p>Busiest day in this range: <?= num($peakDay) ?> view<?= $peakDay === 1 ? '' : 's' ?></p></div>
-    <?php if ($pending > 0): ?>
+    <?php if ($pending > 0 && analytics_geo_mode() === 'auto'): ?>
       <form method="post" style="margin:0">
         <?= csrf_field() ?><input type="hidden" name="do" value="resolve">
         <button class="btn btn-ghost btn-xs" type="submit">
-          Resolve <?= num($pending) ?> pending location<?= $pending === 1 ? '' : 's' ?></button>
+          Fill <?= num($pending) ?> missing location<?= $pending === 1 ? '' : 's' ?></button>
       </form>
+    <?php elseif ($pending > 0): ?>
+      <span class="badge badge-muted">Switch Location detection to Auto to fill these</span>
     <?php endif; ?>
   </div>
   <div class="adm-panel-body">
@@ -430,6 +435,26 @@ require __DIR__ . '/includes/layout.php';
                  <?= setting('analytics_ignore_bots', '1') === '1' ? 'checked' : '' ?>>
           <span>Skip search-engine crawlers and bots</span>
         </label>
+        <label class="check">
+          <input type="checkbox" name="ignore_404" value="1"
+                 <?= setting('analytics_ignore_404', '1') === '1' ? 'checked' : '' ?>>
+          <span>Skip 404s and asset requests <span class="text-dim">(favicon, robots.txt,
+            images, CSS/JS, .well-known probes)</span></span>
+        </label>
+        <label class="check">
+          <input type="checkbox" name="ignore_datacenter" value="1"
+                 <?= setting('analytics_ignore_datacenter', '1') === '1' ? 'checked' : '' ?>>
+          <span>Skip cloud / hosting traffic <span class="text-dim">(Google, Amazon,
+            DigitalOcean, OVH, Hetzner, monitoring and scanner IPs — the usual source of
+            fake “foreign visitors”)</span></span>
+        </label>
+        <label class="check">
+          <input type="checkbox" name="trust_proxy" value="1"
+                 <?= setting('analytics_trust_proxy', '0') === '1' ? 'checked' : '' ?>>
+          <span>Trust proxy/CDN headers for the real IP <span class="text-dim">— only turn this
+            on behind Cloudflare or a known reverse proxy, otherwise bots can spoof their
+            country via X-Forwarded-For</span></span>
+        </label>
 
         <div class="form-group mt-3">
           <label class="form-label" for="geo">Location detection</label>
@@ -442,9 +467,9 @@ require __DIR__ . '/includes/layout.php';
             <option value="off"    <?= $gm === 'off'    ? 'selected' : '' ?>>
               Off — do not record location at all</option>
           </select>
-          <p class="form-hint">In Auto mode a lookup happens once per address and is
-             cached forever, and it can never delay a page: anything slow is left
-             pending and filled in afterwards.</p>
+          <p class="form-hint">In Auto mode a country-only CDN header is upgraded with
+             region and city from one cached IP lookup. It can never delay a page:
+             anything slow is left pending and filled in afterwards.</p>
         </div>
 
         <div class="form-group">
@@ -467,7 +492,7 @@ require __DIR__ . '/includes/layout.php';
         <span class="v"><?= num((int) fetch_col('SELECT COUNT(*) FROM visits', [], 0)) ?></span></div>
       <div class="kv"><span class="k">Cached IP locations</span>
         <span class="v"><?= num((int) fetch_col('SELECT COUNT(*) FROM ip_geo', [], 0)) ?></span></div>
-      <div class="kv"><span class="k">Waiting on a location</span>
+      <div class="kv"><span class="k">Missing city / region</span>
         <span class="v text-gold"><?= num($pending) ?></span></div>
 
       <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">

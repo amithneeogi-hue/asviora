@@ -1,8 +1,10 @@
 <?php
 require_once __DIR__ . '/config/config.php';
 
-$page_title = 'About Us';
-$page_desc  = 'Asviora Games is a skill-based gaming platform built on the belief that games should be won with a sharp mind, not a lucky roll.';
+$page_title = 'About Asviora Games';
+$page_desc  = 'Asviora Games is an online skill-gaming platform built on the belief that games should be won with a sharp mind, not a lucky roll.';
+$seo_keywords = 'about asviora games, online skill games platform, skill gaming, brain games, '
+              . 'puzzle games india, fair play gaming, asviora';
 
 $totPlayers = (int) fetch_col('SELECT COUNT(*) FROM users WHERE status = "active"', [], 0);
 $totRounds  = (int) fetch_col('SELECT COUNT(*) FROM scores', [], 0);

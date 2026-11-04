@@ -10,7 +10,6 @@
 require_once __DIR__ . '/config/config.php';
 
 header('Content-Type: application/xml; charset=utf-8');
-header('X-Robots-Tag: noindex');
 
 $urls = [];
 $add  = static function (string $key, string $loc, ?string $mod, string $freq, string $prio) use (&$urls): void {

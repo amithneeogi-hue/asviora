@@ -59,7 +59,7 @@ function seo_static_pages(): array
 function seo_private_keys(): array
 {
     return ['dashboard', 'pay', 'pay-result', 'pay-callback', 'quiz-play', 'chess-play',
-            'logout', '404', 'game-frame', 'reset-admin-password', 'install', 'offline'];
+            'login', 'logout', '404', 'game-frame', 'reset-admin-password', 'install', 'offline'];
 }
 
 /**
@@ -67,41 +67,73 @@ function seo_private_keys(): array
  * $page_title / $page_desc each page file sets. Used by the admin list
  * and the AI helper so they can show and improve the real current text.
  */
+function seo_home_title_default(string $site, string $tagline): string
+{
+    $kw = array_values(array_filter(array_map('trim',
+        explode(',', (string) setting('seo_keywords')))));
+    $kw = array_slice($kw, 0, 2);
+    return setting('seo_home_title')
+         ?: ($site . ' — ' . ($kw ? ucfirst(implode(', ', $kw)) : $tagline));
+}
+
 function seo_default_meta(string $key): array
 {
     $site = setting('site_name', 'Asviora Games');
     $map = [
-        'home'        => ['', setting('site_description')],
-        'games'       => ['All Games', 'Play skill games online on ' . $site . ' — 3D Cube Solver, Memory Match, Sudoku, Chess, the timed Quiz Contest and the Daily Spin. Play in your browser or on the Android app.'],
-        'quiz'        => ['Quiz Contest', 'Levelled quiz — clear a level to open the next, with your own set of questions.'],
-        'spin'        => ['Daily Spin', 'One free spin every day. Up to 1,000 coins, no entry fee, no catch.'],
-        'chess'       => ['Chess', 'Play chess against the computer, or put coins on the table and challenge anyone with a link. Winner takes the pot.'],
-        'leaderboard' => ['Leaderboard', 'Live leaderboards for every ' . $site . ' title — daily, weekly and all-time rankings.'],
-        'blog'        => ['Blog', 'Game guides, strategy breakdowns and platform updates from the ' . $site . ' team.'],
-        'about'       => ['About Us', $site . ' is a skill-based gaming platform built on the belief that games should be won with a sharp mind, not a lucky roll.'],
-        'contact'     => ['Contact Us', 'Get in touch with the ' . $site . ' team by email, Facebook or Instagram.'],
-        'govt-exam'   => [setting('govt_exam_label', 'Govt Exam'), setting('govt_exam_tagline', 'WBCS, SSC, Rail, Bank & PSC practice.')],
-        'register'    => ['Create Account', 'Sign up on ' . $site . ' to play Sudoku, Memory Match, 3D Cube, Chess, the Quiz Contest and the Daily Spin — and climb the leaderboards.'],
-        'login'       => ['Log In', 'Log in to ' . $site . ' to play skill games, quizzes and chess, and track your coins, XP and rank.'],
+        'home'        => [seo_home_title_default($site, setting('site_tagline', 'Where Skill Wins')), setting('site_description'),
+                          setting('seo_keywords')],
+        'games'       => ['Play Skill Games Online', 'Play online skill games on ' . $site . ' — 3D Cube Solver, Memory Match, Sudoku, Chess, Quiz Contest and Daily Spin. Free in your browser or on Android.',
+                          'online skill games, play games online, sudoku online, memory match, 3d cube solver, chess online, quiz contest, daily spin, browser games, android games'],
+        'quiz'        => ['Play Online Quiz Contest', 'Play the online quiz contest — clear a level to open the next, with your own set of questions.',
+                          'online quiz contest, quiz game, play quiz online, quiz levels, general knowledge quiz, gk quiz, competitive exam quiz, brain quiz'],
+        'spin'        => ['Free Daily Spin & Win Coins', 'One free daily spin on ' . $site . '. Win up to 1,000 coins - no entry fee, no catch, just a daily chance to boost your balance.',
+                          'daily spin, free spin, spin and win, win coins, daily rewards, free coins, online spin game, play spin online'],
+        'chess'       => ['Play Chess Online', 'Play chess online against the computer, or put coins on the table and challenge anyone with a link on ' . $site . '. Winner takes the pot.',
+                          'play chess online, online chess, chess game, chess vs computer, multiplayer chess, chess challenge, chess with coins, free chess online'],
+        'leaderboard' => ['Game Leaderboard & Rankings', 'Live game leaderboards for every ' . $site . ' title — daily, weekly and all-time rankings.',
+                          'game leaderboard, player rankings, top players, daily leaderboard, weekly rankings, all time leaderboard, sudoku ranking, chess ranking'],
+        'blog'        => ['Game Guides & Strategy Blog', 'Game guides, strategy breakdowns and platform updates from the ' . $site . ' team - tips to improve your Sudoku, Chess, memory and quiz scores.',
+                          'game guides, game strategy, sudoku tips, chess strategy, memory game tips, quiz preparation, gaming blog, asviora blog'],
+        'about'       => ['About ' . $site, $site . ' is an online skill-gaming platform built on the belief that games should be won with a sharp mind, not a lucky roll.',
+                          'about asviora games, online skill games platform, skill gaming, brain games, puzzle games india, fair play gaming, asviora'],
+        'contact'     => ['Contact ' . $site, 'Get in touch with the ' . $site . ' team by email, Facebook or Instagram for support, suggestions or partnership queries. We reply within one business day.',
+                          'contact asviora games, customer support, game support, feedback, partnership, help'],
+        'govt-exam'   => [setting('govt_exam_label', 'Govt Exam') . ' Practice & Mock Tests', setting('govt_exam_tagline', 'WBCS, SSC, Rail, Bank & PSC practice.') . ' Mock tests, previous-year papers and a level ladder that tracks your weak areas.',
+                          'govt exam practice, wbcs, ssc, railway exam, bank exam, psc, mock tests, previous year papers, online exam preparation'],
+        'register'    => ['Create Free Account & Play Games', 'Sign up on ' . $site . ' to play Sudoku, Memory Match, 3D Cube, Chess, the Quiz Contest and the Daily Spin — and climb the leaderboards.',
+                          'create free account, sign up, play skill games online, asviora games register, free games account, play sudoku online, play chess online'],
+        'login'       => ['Log In to Play Skill Games', 'Log in to ' . $site . ' to play skill games, quizzes and chess, and track your coins, XP and rank.',
+                          'play skill games, asviora games login, quiz login, chess login, sudoku login, account login'],
     ];
     if (isset($map[$key])) {
-        return ['title' => $map[$key][0], 'desc' => $map[$key][1]];
+        return ['title' => $map[$key][0], 'desc' => $map[$key][1],
+                'keywords' => $map[$key][2] ?? ''];
     }
     if (str_starts_with($key, 'game:')) {
         $g = fetch_one('SELECT title, tagline, description FROM games WHERE slug = ?', [substr($key, 5)]);
         if ($g) {
-            return ['title' => $g['title'], 'desc' => $g['tagline'] ?: (string) $g['description']];
+            $tag  = $g['tagline'] ? rtrim($g['tagline'], '. ') . '. ' : '';
+            $desc = trim($tag . seo_clip((string) $g['description'],
+                    max(40, 155 - mb_strlen($tag))));
+            return ['title' => $g['title'] . ' — Play Online', 'desc' => $desc,
+                    'keywords' => $g['title'] . ', play ' . $g['title']
+                                . ' online, online skill games, browser game, android game'];
         }
     }
     if (str_starts_with($key, 'post:')) {
         $p = fetch_one('SELECT title, excerpt, content, meta_title, meta_desc FROM blog_posts WHERE slug = ?',
                        [substr($key, 5)]);
         if ($p) {
-            return ['title' => $p['meta_title'] ?: $p['title'],
-                    'desc'  => $p['meta_desc'] ?: ($p['excerpt'] ?: seo_clip((string) $p['content'], 155))];
+            $pt = $p['meta_title'] ?: $p['title'];
+            $kwHead = mb_strlen($pt) > 60
+                ? implode(' ', array_slice(preg_split('/\s+/u', trim($pt)), 0, 5))
+                : $pt;
+            return ['title' => $pt,
+                    'desc'  => $p['meta_desc'] ?: ($p['excerpt'] ?: seo_clip((string) $p['content'], 155)),
+                    'keywords' => $kwHead . ', asviora blog, game guides, online skill games'];
         }
     }
-    return ['title' => '', 'desc' => ''];
+    return ['title' => '', 'desc' => '', 'keywords' => ''];
 }
 
 /** Game and blog pages, for the admin list and the sitemap. */
@@ -175,6 +207,12 @@ function seo_image_url(string $v): string
     if (is_file(UPLOAD_PATH . '/seo/' . $v)) {
         return UPLOAD_URL . '/seo/' . rawurlencode($v);
     }
+    // A bare filename is an upload. If the file has gone, emit nothing so
+    // the caller can fall back to the site logo instead of a 404 image.
+    if (!str_contains($v, '/')) {
+        return is_file(UPLOAD_PATH . '/' . $v)
+            ? UPLOAD_URL . '/' . rawurlencode($v) : '';
+    }
     return url($v);
 }
 
@@ -196,10 +234,25 @@ function seo_resolve(array $in = []): array
     if (!empty($o['title'])) {
         $title = $o['title'];
     } elseif ($key === 'home' || $pageT === '') {
-        $title = setting('seo_home_title') ?: ($site . ' — ' . $tagline);
+        // Put the first two target keywords in the home title so the most
+        // important page does not just repeat the brand tagline.
+        $title = seo_home_title_default($site, $tagline);
     } else {
         $fmt   = setting('seo_title_format', '{page} | {site}') ?: '{page} | {site}';
         $title = strtr($fmt, ['{page}' => $pageT, '{site}' => $site, '{tagline}' => $tagline]);
+    }
+
+    if (empty($o['title']) && mb_strlen($title) > 65) {
+        $suffix = ' | ' . $site;
+        if (str_ends_with($title, $suffix)) {
+            $room = 65 - mb_strlen($suffix);
+            $base = mb_substr($title, 0, -mb_strlen($suffix));
+            $title = $room >= 30
+                ? rtrim(mb_substr($base, 0, $room - 1)) . '…' . $suffix
+                : mb_substr($title, 0, 64) . '…';
+        } else {
+            $title = mb_substr($title, 0, 64) . '…';
+        }
     }
 
     // ---- description + keywords -------------------------------------
@@ -207,12 +260,23 @@ function seo_resolve(array $in = []): array
           : ((string) ($in['desc'] ?? '') !== '' ? (string) $in['desc'] : setting('site_description'));
     $desc = seo_clip($desc, 300);
 
-    $kw = !empty($o['keywords']) ? $o['keywords'] : ($in['keywords'] ?? setting('seo_keywords'));
+    $kw = !empty($o['keywords']) ? $o['keywords']
+        : (!empty($in['keywords']) ? $in['keywords'] : setting('seo_keywords'));
 
     // ---- image ------------------------------------------------------
-    $img = !empty($o['og_image']) ? seo_image_url($o['og_image'])
-         : ((string) ($in['image'] ?? '') !== '' ? (string) $in['image']
-         : (setting('seo_og_image') !== '' ? seo_image_url(setting('seo_og_image')) : logo_wide()));
+    // override -> the page's own image -> the global share image -> logo.
+    // A saved file that no longer exists is skipped rather than sent as a
+    // broken URL.
+    $img = !empty($o['og_image']) ? seo_image_url($o['og_image']) : '';
+    if ($img === '' && (string) ($in['image'] ?? '') !== '') {
+        $img = (string) $in['image'];
+    }
+    if ($img === '' && setting('seo_og_image') !== '') {
+        $img = seo_image_url(setting('seo_og_image'));
+    }
+    if ($img === '') {
+        $img = logo_wide();
+    }
 
     // ---- robots -----------------------------------------------------
     $robots = 'index,follow,max-image-preview:large';
@@ -237,18 +301,29 @@ function seo_resolve(array $in = []): array
         'url'      => url(''),
         'logo'     => logo_icon(512),
     ];
-    $same = array_values(array_filter([
-        setting('social_facebook'), setting('social_instagram'),
-        setting('social_youtube'), setting('social_twitter'),
-    ]));
+    // De-duplicate social URLs: a wrong copy/paste used to send the same
+    // Facebook link three times in the Organization schema.
+    $same = [];
+    foreach ([setting('social_facebook'), setting('social_instagram'),
+              setting('social_youtube'), setting('social_twitter')] as $social) {
+        $social = trim($social);
+        if ($social !== '' && filter_var($social, FILTER_VALIDATE_URL) !== false
+            && !in_array($social, $same, true)) {
+            $same[] = $social;
+        }
+    }
     if ($same) {
         $org['sameAs'] = $same;
     }
     if (setting('contact_email') !== '') {
-        $org['contactPoint'] = ['@type' => 'ContactPoint', 'contactType' => 'customer support',
-                                'email' => setting('contact_email')]
-                             + (setting('contact_phone') !== ''
-                                ? ['telephone' => setting('contact_phone')] : []);
+        $point = ['@type' => 'ContactPoint', 'contactType' => 'customer support',
+                  'email' => setting('contact_email')];
+        $phone = trim(setting('contact_phone'));
+        // Skip obvious placeholders such as "+91 000000000".
+        if ($phone !== '' && !preg_match('/0{6,}/', $phone)) {
+            $point['telephone'] = $phone;
+        }
+        $org['contactPoint'] = $point;
     }
     $schema[] = $org;
 
@@ -290,7 +365,7 @@ function seo_resolve(array $in = []): array
         'image'       => $img,
         'canonical'   => $canonical,
         'robots'      => $robots,
-        'type'        => $in['type'] ?? ($key === 'home' ? 'website' : 'article'),
+        'type'        => $in['type'] ?? (str_starts_with($key, 'post:') ? 'article' : 'website'),
         'site'        => $site,
         'schema'      => $schema,
     ];

@@ -1,8 +1,11 @@
 <?php
 require_once __DIR__ . '/config/config.php';
 
-$page_title = 'Blog';
-$page_desc  = 'Game guides, strategy breakdowns and platform updates from the Asviora Games team.';
+$page_title = 'Game Guides & Strategy Blog';
+$page_desc  = 'Game guides, strategy breakdowns and platform updates from the Asviora Games team '
+            . '- tips to improve your Sudoku, Chess, memory and quiz scores.';
+$seo_keywords = 'game guides, game strategy, sudoku tips, chess strategy, memory game tips, '
+              . 'quiz preparation, gaming blog, asviora blog';
 
 $catSlug = get('cat');
 $search  = get('q');

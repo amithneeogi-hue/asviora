@@ -92,8 +92,10 @@ $levels     = quiz_levels();
 $totalDone  = $overview ? $overview['passed'] : 0;
 $totalAll   = $overview ? $overview['total']  : 0;
 
-$page_title = 'Quiz Contest';
-$page_desc  = 'Levelled quiz — clear a level to open the next, with your own set of questions.';
+$page_title = 'Play Online Quiz Contest';
+$page_desc  = 'Play the online quiz contest — clear a level to open the next, with your own set of questions.';
+$seo_keywords = 'online quiz contest, quiz game, play quiz online, quiz levels, general knowledge quiz, '
+              . 'gk quiz, competitive exam quiz, brain quiz';
 require __DIR__ . '/includes/header.php';
 ?>
 

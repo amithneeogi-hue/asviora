@@ -5,8 +5,9 @@ if (is_logged_in()) {
     redirect('dashboard.php');
 }
 
-$page_title = 'Create Account';
+$page_title = 'Create Free Account & Play Games';
 $page_desc  = 'Sign up on ' . setting('site_name', 'Asviora Games') . ' to play Sudoku, Memory Match, 3D Cube, Chess, the Quiz Contest and the Daily Spin — and climb the leaderboards.';
+$seo_keywords = 'create free account, sign up, play skill games online, asviora games register, free games account, play sudoku online, play chess online';
 $errors = [];
 $old    = ['name' => '', 'username' => '', 'email' => '', 'phone' => '', 'ref' => get('ref')];
 

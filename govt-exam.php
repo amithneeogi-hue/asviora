@@ -39,10 +39,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_ok()) {
 }
 $sent = get('joined') === '1';
 
-$page_title = setting('govt_exam_label', 'Govt Exam')
+$page_title = setting('govt_exam_label', 'Govt Exam') . ' Practice & Mock Tests'
             . ($status === 'soon' ? ' — Coming Soon' : '');
 $page_desc  = setting('govt_exam_tagline',
-              'WBCS, SSC, Rail, Bank & PSC practice — built the Asviora way.');
+              'WBCS, SSC, Rail, Bank & PSC practice — built the Asviora way.')
+            . ' Mock tests, previous-year papers and a level ladder that tracks your weak areas.';
+$seo_keywords = 'govt exam practice, wbcs, ssc, railway exam, bank exam, psc, mock tests, '
+              . 'previous year papers, online exam preparation';
 
 require __DIR__ . '/includes/header.php';
 ?>

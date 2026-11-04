@@ -146,6 +146,9 @@ INSERT IGNORE INTO `settings` (`skey`,`svalue`,`sgroup`,`slabel`) VALUES
   ('analytics_geo_mode',      'auto', 'analytics', 'off | header | auto (header, then IP lookup)'),
   ('analytics_ignore_admin',  '1',    'analytics', 'Do not log views made by a signed-in admin'),
   ('analytics_ignore_bots',   '1',    'analytics', 'Do not log crawlers'),
+  ('analytics_ignore_404',    '1',    'analytics', 'Do not log 404s and asset requests'),
+  ('analytics_ignore_datacenter', '1', 'analytics', 'Do not log cloud / hosting / proxy traffic'),
+  ('analytics_trust_proxy',   '0',    'analytics', 'Trust X-Forwarded-For / CDN IP headers'),
   ('analytics_retention_days','365',  'analytics', 'Delete raw page views older than this'),
   ('analytics_salt',          '',     'analytics', 'Random salt for the visitor hash — set once'),
   -- govt exam

@@ -51,9 +51,11 @@ $open = fetch_all(
 
 $live = (int) fetch_col('SELECT COUNT(*) FROM chess_matches WHERE status = "active"', [], 0);
 
-$page_title = 'Chess';
-$page_desc  = 'Play chess against the computer, or put coins on the table and challenge '
-            . 'anyone with a link. Winner takes the pot.';
+$page_title = 'Play Chess Online';
+$page_desc  = 'Play chess online against the computer, or put coins on the table and challenge '
+            . 'anyone with a link on Asviora Games. Winner takes the pot.';
+$seo_keywords = 'play chess online, online chess, chess game, chess vs computer, multiplayer chess, '
+              . 'chess challenge, chess with coins, free chess online';
 require __DIR__ . '/includes/header.php';
 ?>
 

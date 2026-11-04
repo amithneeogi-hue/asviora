@@ -41,8 +41,11 @@ if ($enabled) {
     }
 }
 
-$page_title = 'Daily Spin';
-$page_desc  = 'One free spin every day. Up to 1,000 coins, no entry fee, no catch.';
+$page_title = 'Free Daily Spin & Win Coins';
+$page_desc  = 'One free daily spin on Asviora Games. Win up to 1,000 coins - no entry fee, '
+            . 'no catch, just a daily chance to boost your balance.';
+$seo_keywords = 'daily spin, free spin, spin and win, win coins, daily rewards, free coins, '
+              . 'online spin game, play spin online';
 require __DIR__ . '/includes/header.php';
 
 $n = count($segments);

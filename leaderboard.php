@@ -1,8 +1,10 @@
 <?php
 require_once __DIR__ . '/config/config.php';
 
-$page_title = 'Leaderboard';
-$page_desc  = 'Live leaderboards for every Asviora Games title — daily, weekly and all-time rankings.';
+$page_title = 'Game Leaderboard & Rankings';
+$page_desc  = 'Live game leaderboards for every Asviora Games title — daily, weekly and all-time rankings.';
+$seo_keywords = 'game leaderboard, player rankings, top players, daily leaderboard, weekly rankings, '
+              . 'all time leaderboard, sudoku ranking, chess ranking';
 
 $gameSlug = get('game');
 $range    = get('range', 'all');

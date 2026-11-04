@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_ok() && $installed) {
         $aiResult = seo_ai_suggest($allPages[$key]['label'], $allPages[$key]['url'], [
             'title'       => post('title') ?: $def['title'],
             'description' => post('description') ?: $def['desc'],
-            'keywords'    => post('keywords'),
+            'keywords'    => post('keywords') ?: ($def['keywords'] ?? ''),
         ], $def['desc']);
         if (!$aiResult['ok']) {
             flash($aiResult['error'], 'error');
@@ -91,7 +91,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_ok() && $installed) {
             }
             $def = seo_default_meta($key);
             $r = seo_ai_suggest($pg['label'], $pg['url'], ['title' => $def['title'],
-                                'description' => $def['desc'], 'keywords' => ''], $def['desc']);
+                                'description' => $def['desc'],
+                                'keywords' => $def['keywords'] ?? ''], $def['desc']);
             if (!$r['ok']) {
                 $fail = $r['error'];
                 break;
@@ -120,7 +121,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_ok() && $installed) {
         set_setting('seo_robots_extra', mb_substr((string) ($_POST['seo_robots_extra'] ?? ''), 0, 2000));
         set_setting('seo_noindex_site', empty($_POST['seo_noindex_site']) ? '0' : '1');
         set_setting('seo_public_catalogue', empty($_POST['seo_public_catalogue']) ? '0' : '1');
-        if ($f = save_upload('og_default', 'seo')) {
+        if (!empty($_POST['og_default_clear'])) {
+            set_setting('seo_og_image', '');
+        } elseif ($f = save_upload('og_default', 'seo')) {
             set_setting('seo_og_image', $f);
         }
         flash('Global SEO settings saved.');
@@ -156,7 +159,8 @@ $rows = [];
 if ($installed && $tab === 'pages' && $edit === '') {
     foreach ($allPages as $key => $pg) {
         $def = seo_default_meta($key);
-        $s   = seo_resolve(['key' => $key, 'title' => $def['title'], 'desc' => $def['desc']]);
+        $s   = seo_resolve(['key' => $key, 'title' => $def['title'], 'desc' => $def['desc'],
+                            'keywords' => $def['keywords'] ?? '']);
         [$score, $notes] = seo_audit($s);
         $rows[$key] = $pg + ['s' => $s, 'score' => $score, 'notes' => $notes, 'o' => seo_override($key)];
     }
@@ -190,9 +194,10 @@ require __DIR__ . '/includes/layout.php';
       'description' => $aiResult['description'] ?? ($o['description'] ?? ''),
       'keywords'    => $aiResult['keywords'] ?? ($o['keywords'] ?? ''),
   ];
-  $preview = seo_resolve(['key' => $edit, 'title' => $def['title'], 'desc' => $def['desc']]);
+  $preview = seo_resolve(['key' => $edit, 'title' => $def['title'], 'desc' => $def['desc'],
+                          'keywords' => $def['keywords'] ?? '']);
   $autoTitle = ($edit === 'home' || $def['title'] === '')
-      ? (setting('seo_home_title') ?: setting('site_name') . ' — ' . setting('site_tagline'))
+      ? seo_home_title_default(setting('site_name'), setting('site_tagline', 'Where Skill Wins'))
       : strtr(setting('seo_title_format', '{page} | {site}') ?: '{page} | {site}',
               ['{page}' => $def['title'], '{site}' => setting('site_name'), '{tagline}' => setting('site_tagline')]);
 ?>
@@ -250,7 +255,7 @@ require __DIR__ . '/includes/layout.php';
           <label class="form-label" for="og_file">Share image (Facebook / WhatsApp / X) <span class="text-dim">1200×630 best</span></label>
           <?php if (!empty($o['og_image'])): ?>
             <div class="row" style="gap:10px;align-items:center;margin-bottom:8px">
-              <img src="<?= e(seo_image_url($o['og_image'])) ?>" alt="" style="width:140px;border-radius:8px">
+              <img src="<?= e(seo_image_url($o['og_image']) ?: logo_wide()) ?>" alt="" style="width:140px;border-radius:8px">
               <label class="check"><input type="checkbox" name="og_clear" value="1"><span>Remove</span></label>
             </div>
           <?php endif; ?>
@@ -324,7 +329,8 @@ require __DIR__ . '/includes/layout.php';
           <textarea class="form-control" id="seo_keywords" name="seo_keywords" rows="2" maxlength="400"><?= e(setting('seo_keywords')) ?></textarea></div>
         <div class="form-group"><label class="form-label" for="og_default">Default share image</label>
           <?php if (setting('seo_og_image') !== ''): ?>
-            <img src="<?= e(seo_image_url(setting('seo_og_image'))) ?>" alt="" style="width:160px;border-radius:8px;display:block;margin-bottom:8px">
+            <img src="<?= e(seo_image_url(setting('seo_og_image')) ?: logo_wide()) ?>" alt="" style="width:160px;border-radius:8px;display:block;margin-bottom:8px">
+            <label class="check" style="margin-bottom:8px"><input type="checkbox" name="og_default_clear" value="1"><span>Remove</span></label>
           <?php endif; ?>
           <input class="form-control" type="file" id="og_default" name="og_default" accept="image/*">
           <p class="form-hint">Blank = the site logo.</p></div>
@@ -444,7 +450,8 @@ require __DIR__ . '/includes/layout.php';
   </div>
 </div>
 <p class="text-dim" style="font-size:.85rem">Login, dashboard, payment and in-game pages are kept out of search automatically.
-  Pages behind the login (games, quiz, spin, chess) only rank once you make them public — see Global.</p>
+  The <strong>Games</strong> page can be opened to guests from Global; quiz, spin, chess and
+  govt-exam stay behind the login, so their SEO applies to signed-in players only.</p>
 
 <?php endif; ?>
 
