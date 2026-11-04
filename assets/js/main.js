@@ -248,4 +248,48 @@
       else if (frame.requestFullscreen) frame.requestFullscreen();
     });
   }
+
+  /* ---------- back / exit option while a game frame is fullscreen ----------
+     requestFullscreen() covers the whole viewport, which pushes the page's
+     Back button out of reach. While the game frame owns fullscreen, keep a
+     floating exit control inside it so the player can always get back. */
+  var fsExitBtn = null;
+  function fsHost() {
+    var fe = document.fullscreenElement;
+    return fe && fe !== document.body ? fe : document.querySelector('.play-frame');
+  }
+  function buildFsExitBtn(host) {
+    var btn = document.createElement('button');
+    btn.id = 'fsExitBtn';
+    btn.type = 'button';
+    btn.className = 'fs-exit-btn';
+    btn.title = 'Exit fullscreen';
+    btn.setAttribute('aria-label', 'Exit fullscreen');
+    btn.innerHTML = '&#10005; Exit Fullscreen';
+    btn.addEventListener('click', function () {
+      if (document.exitFullscreen) document.exitFullscreen();
+    });
+    host.appendChild(btn);
+    return btn;
+  }
+  function syncFsUi() {
+    if (fsBtn) {
+      fsBtn.innerHTML = document.fullscreenElement ? '&#10005; Exit' : '&#9974; Fullscreen';
+    }
+    if (!document.fullscreenElement) {
+      if (fsExitBtn && fsExitBtn.parentNode) fsExitBtn.parentNode.removeChild(fsExitBtn);
+      fsExitBtn = null;
+      return;
+    }
+    var host = fsHost();
+    var btn = fsExitBtn;
+    if (!btn || btn.parentNode !== host) {
+      if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
+      btn = buildFsExitBtn(host);
+      fsExitBtn = btn;
+    }
+    btn.classList.add('is-active');
+  }
+  document.addEventListener('fullscreenchange', syncFsUi);
+  syncFsUi();
 })();

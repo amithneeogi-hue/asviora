@@ -16,9 +16,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pass = (string) ($_POST['password'] ?? '');
 
         $_SESSION['admin_fails'] = $_SESSION['admin_fails'] ?? 0;
-        if ($_SESSION['admin_fails'] >= 6 && (time() - (int) ($_SESSION['admin_block'] ?? 0)) < 120) {
-            $errors[] = 'Too many failed attempts. Try again in two minutes.';
-        } elseif ($user === '' || $pass === '') {
+        // if ($_SESSION['admin_fails'] >= 6 && (time() - (int) ($_SESSION['admin_block'] ?? 0)) < 120) {
+        //     $errors[] = 'Too many failed attempts. Try again in two minutes.';
+        // } else
+        if ($user === '' || $pass === '') {
             $errors[] = 'Enter your username and password.';
         } else {
             $row = fetch_one('SELECT * FROM admins WHERE username = ? OR email = ? LIMIT 1',
