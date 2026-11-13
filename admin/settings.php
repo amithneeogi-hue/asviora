@@ -44,6 +44,16 @@ $schema = [
         ['quiz_perfect_bonus', 'Perfect round bonus', 'number', '100', 'Extra coins when every answer in a round is correct'],
         ['quiz_daily_rounds',  'Rewarded rounds per day', 'number', '5', 'Rounds beyond this still score, but pay no coins. 0 = unlimited.'],
     ],
+    'Advertising' => [
+        ['ads_client_id',          'AdSense client ID',  'text', 'ca-pub-1911098914909566', 'Publisher ID from your AdSense account. Leave blank to disable ads.'],
+        ['ads_slot_home',          'Home ad slot',       'text', '', 'AdSense slot for the home page ad. Leave blank to hide.'],
+        ['ads_slot_games',        'Games ad slot',     'text', '', 'AdSense slot for the games listing ad. Leave blank to hide.'],
+        ['ads_slot_leaderboard',  'Leaderboard ad slot', 'text', '', 'AdSense slot for the leaderboard ad. Leave blank to hide.'],
+        ['ads_slot_blog',          'Blog ad slot',      'text', '', 'AdSense slot for the blog ad. Leave blank to hide.'],
+        ['ads_slot_result',       'Quiz / Spin ad slot', 'text', '', 'AdSense slot for quiz / spin result ads. Leave blank to hide.'],
+        ['ads_slot_content',      'Other pages ad slot', 'text', '', 'AdSense slot for remaining content pages. Leave blank to hide.'],
+        ['ads_reward_coins',      'Rewarded ad coins',   'number', '100', 'Coins granted per rewarded ad (the "Double Coins" reward).'],
+    ],
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -55,6 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // toggles live outside the schema loop (unchecked boxes post nothing)
         set_setting('quiz_enabled', empty($_POST['quiz_enabled']) ? '0' : '1');
         set_setting('spin_enabled', empty($_POST['spin_enabled']) ? '0' : '1');
+        set_setting('ads_enabled', empty($_POST['ads_enabled']) ? '0' : '1');
+        set_setting('ads_reward_enabled', empty($_POST['ads_reward_enabled']) ? '0' : '1');
 
         // optional logo replacement — drives the header, footer, favicon,
         // social previews and the page background watermark
@@ -152,6 +164,33 @@ require __DIR__ . '/includes/layout.php';
             <a href="<?= admin_url('spin.php') ?>">Daily Challenges</a> page.
             Questions live in the <a href="<?= admin_url('quiz.php') ?>">question bank</a>.
           </p>
+        </div>
+      </div>
+
+      <div class="adm-panel">
+        <div class="adm-panel-head">
+          <div><h2>Advertising</h2><p>Google AdSense &mdash; switch on and set a slot per page</p></div>
+        </div>
+        <div class="adm-panel-body">
+          <div class="form-group">
+            <label class="check">
+              <input type="checkbox" name="ads_enabled" value="1"
+                     <?= setting('ads_enabled', '1') === '1' ? 'checked' : '' ?>>
+              <span><strong>Google AdSense ads</strong> &mdash; show ads across content pages</span>
+            </label>
+          </div>
+          <p class="form-hint mt-2">
+            Per-placement slot IDs live in the groups above; leave a slot blank to hide that ad.
+            Game play pages never display ads. Rewarded flow grants once per player per day.
+          </p>
+          <div class="form-group" style="margin-top:14px">
+            <label class="check">
+              <input type="checkbox" name="ads_reward_enabled" value="1"
+                     <?= setting('ads_reward_enabled', '0') === '1' ? 'checked' : '' ?>>
+              <span><strong>Rewarded ads</strong> &mdash; watch an ad for Double Coins / Extra Life</span>
+            </label>
+            <div class="form-hint">When on, players can claim the rewarded grants below.</div>
+          </div>
         </div>
       </div>
     </div>

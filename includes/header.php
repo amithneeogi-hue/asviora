@@ -82,6 +82,7 @@ track_visit($page_title ?? null);
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="google-adsense-account" content="ca-pub-1911098914909566">
   <?= seo_head($seo) ?>
   <meta name="theme-color" content="#0b0c0e">
   <link rel="icon" type="image/png" sizes="32x32" href="<?= e(logo_icon(32)) ?>">

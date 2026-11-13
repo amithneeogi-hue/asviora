@@ -12,6 +12,8 @@ $phone   = contact_phone_public();
 // everything playable — the three games plus the quiz and the spin
 $footGames = array_slice(arena_items(), 0, 6);
 ?>
+<?= render_current_ad() ?>
+
 </main>
 
 <footer class="site-footer">

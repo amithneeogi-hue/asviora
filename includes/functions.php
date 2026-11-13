@@ -166,6 +166,97 @@ function set_setting(string $key, string $value): void
 }
 
 // ---------------------------------------------------------------
+// Advertising (Google AdSense)
+// ---------------------------------------------------------------
+
+/** Is site-wide advertising switched on? (Admin -> Advertising) */
+function ads_enabled(): bool
+{
+    return setting('ads_enabled', '1') === '1';
+}
+
+/** AdSense publisher client ID (ca-pub-XXXX). Empty means ads stay off. */
+function ads_client_id(): string
+{
+    return trim(setting('ads_client_id'));
+}
+
+/** Ad slot for a placement key (ads_slot_home, ads_slot_games, ...). Blank hides it. */
+function ads_slot(string $placement): string
+{
+    return trim(setting('ads_slot_' . $placement));
+}
+
+/**
+ * Render the Google AdSense ad for a placement. Returns '' when the admin
+ * switch is off, the client ID is missing or the slot is blank, so pages
+ * never leak ad markup without configuration.
+ */
+function render_ad(string $placement): string
+{
+    if (!ads_enabled()) {
+        return '';
+    }
+    $client = ads_client_id();
+    $slot   = ads_slot($placement);
+    if ($client === '' || $slot === '') {
+        return '';
+    }
+    return '<ins class="adsbygoogle" style="display:block" data-ad-client="' . e($client)
+         . '" data-ad-slot="' . e($slot) . '" data-ad-format="auto" data-full-width-responsive="true"></ins>'
+         . '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' . e($client) . '" crossorigin="anonymous"></script>'
+         . '<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>';
+}
+
+/**
+ * Ad placement key for the current script, or '' when the page must stay
+ * ad-free (gameplay, auth and app/payment surfaces).
+ */
+function ad_placement_for(string $script): string
+{
+    $f = basename($script);
+    if (in_array($f, [
+        // gameplay — never interrupt a match
+        'play.php', 'quiz-play.php', 'chess-play.php', 'spin.php', 'spin-access.php', 'chess.php',
+        // auth / app / payment surfaces
+        'login.php', 'register.php', 'dashboard.php', 'pay.php', 'pay-result.php', 'pay-callback.php', 'pay-webhook.php',
+    ], true)) {
+        return '';
+    }
+    switch ($f) {
+        case 'index.php':         return 'home';
+        case 'games.php':         return 'games';
+        case 'leaderboard.php':  return 'leaderboard';
+        case 'blog.php':          return 'blog';
+        case 'quiz.php':          return 'result';
+        default:                  return 'content';
+    }
+}
+
+/** Ad for the current page, rendered just above the footer. */
+function render_current_ad(): string
+{
+    $placement = ad_placement_for($_SERVER['SCRIPT_NAME'] ?? '');
+    return $placement === '' ? '' : render_ad($placement);
+}
+
+// ---------------------------------------------------------------
+// Rewarded ads (Google AdSense rewarded placements)
+// ---------------------------------------------------------------
+
+/** Is the rewarded-ad flow switched on? (Admin -> Advertising) */
+function ads_reward_enabled(): bool
+{
+    return setting('ads_reward_enabled', '0') === '1';
+}
+
+/** Coins granted per rewarded ad — the "Double Coins" reward. */
+function ads_reward_coins(): int
+{
+    return max(0, (int) setting('ads_reward_coins', '100'));
+}
+
+// ---------------------------------------------------------------
 // CSRF
 // ---------------------------------------------------------------
 
