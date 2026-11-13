@@ -142,7 +142,7 @@ require __DIR__ . '/includes/header.php';
   <div class="container">
     <div class="head center">
       <span class="eyebrow">Inside the extras</span>
-      <h2>How the Quiz and the Spin pay out</h2>
+      <h2>How Quiz & Challenge Work</h2>
       <p>Both sit in the arena above with everything else &mdash; here is what the
          clocks and the prize ladder actually look like.</p>
     </div>
