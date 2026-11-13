@@ -37,9 +37,12 @@ if (setting('seo_noindex_site', '0') !== '1') {
                  $p['updated_at'] ?: $p['published_at'], 'monthly', '0.6');
         }
     }
-    $add('about',    url('about.php'),    null, 'monthly', '0.5');
-    $add('contact',  url('contact.php'),  null, 'yearly',  '0.4');
-    $add('register', url('register.php'), null, 'yearly',  '0.5');
+    $add('about',               url('about.php'),               null, 'monthly', '0.5');
+    $add('contact',             url('contact.php'),             null, 'yearly',  '0.4');
+    $add('privacy-policy',      url('privacy-policy.php'),      null, 'yearly',  '0.4');
+    $add('terms',               url('terms.php'),               null, 'yearly',  '0.4');
+    $add('responsible-gaming',  url('responsible-gaming.php'),  null, 'yearly',  '0.4');
+    $add('register',            url('register.php'),            null, 'yearly',  '0.5');
 }
 
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";

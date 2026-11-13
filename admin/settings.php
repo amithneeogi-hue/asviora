@@ -45,7 +45,7 @@ $schema = [
         ['quiz_daily_rounds',  'Rewarded rounds per day', 'number', '5', 'Rounds beyond this still score, but pay no coins. 0 = unlimited.'],
     ],
     'Advertising' => [
-        ['ads_client_id',          'AdSense client ID',  'text', 'ca-pub-1911098914909566', 'Publisher ID from your AdSense account. Leave blank to disable ads.'],
+        ['ads_client_id',          'AdSense client ID',  'text', 'ca-pub-1911098914909566', 'Publisher ID from your AdSense account (ca-pub-...). Leave blank to disable ads and remove ads.txt.'],
         ['ads_slot_home',          'Home ad slot',       'text', '', 'AdSense slot for the home page ad. Leave blank to hide.'],
         ['ads_slot_games',        'Games ad slot',     'text', '', 'AdSense slot for the games listing ad. Leave blank to hide.'],
         ['ads_slot_leaderboard',  'Leaderboard ad slot', 'text', '', 'AdSense slot for the leaderboard ad. Leave blank to hide.'],
@@ -99,6 +99,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 set_setting($key, $val);
             }
         }
+        // Keep ads.txt in sync with the publisher ID entered above. Google
+        // requires the exact declaration, so we only write it when a valid
+        // publisher ID is present and remove any stale file otherwise.
+        $pub = trim((string) ($_POST['ads_client_id'] ?? ''));
+        $pub = preg_replace('/^ca-/', '', $pub);
+        $adsFile = ROOT_PATH . '/ads.txt';
+        if ($pub !== '' && preg_match('/^pub-[0-9]+$/', $pub)) {
+            file_put_contents($adsFile, "google.com, " . $pub . ", DIRECT, f08c47fec0942fa0\n", LOCK_EX);
+        } elseif (is_file($adsFile)) {
+            @unlink($adsFile);
+        }
+
         if ($errors) {
             foreach ($errors as $x) flash($x, 'error');
         } else {

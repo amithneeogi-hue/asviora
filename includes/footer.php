@@ -79,6 +79,9 @@ $footGames = array_slice(arena_items(), 0, 6);
           <li><a href="<?= url('blog.php') ?>">Blog</a></li>
           <li><a href="<?= url('about.php') ?>">About Us</a></li>
           <li><a href="<?= url('contact.php') ?>">Contact</a></li>
+          <li><a href="<?= url('privacy-policy.php') ?>">Privacy Policy</a></li>
+          <li><a href="<?= url('terms.php') ?>">Terms &amp; Conditions</a></li>
+          <li><a href="<?= url('responsible-gaming.php') ?>">Responsible Gaming</a></li>
         </ul>
       </div>
 
