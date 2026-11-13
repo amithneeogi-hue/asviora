@@ -247,7 +247,7 @@ $bodyClass = implode(' ', array_unique(array_filter(explode(' ', ($body_class ??
                 <a href="<?= url('quiz.php') ?>">&#129504; Quiz Contest</a>
               <?php endif; ?>
               <?php if ($navSpin): ?>
-                <a href="<?= url('spin.php') ?>">&#127920; Daily Spin</a>
+                <a href="<?= url('spin.php') ?>">&#127920; Daily Challenges</a>
               <?php endif; ?>
               <a href="<?= url('dashboard.php?tab=history') ?>">&#128220; Match History</a>
               <a href="<?= url('dashboard.php?tab=wallet') ?>">&#129689; Coin Wallet</a>

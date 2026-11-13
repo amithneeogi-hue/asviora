@@ -36,7 +36,7 @@ if (quiz_on()) {
         [['name' => 'Quiz Contest', 'url' => url('quiz.php'), 'icons' => [['src' => $icon(192), 'sizes' => '192x192']]]]);
 }
 if (spin_on()) {
-    $shortcuts[] = ['name' => 'Daily Spin', 'url' => url('spin.php'), 'icons' => [['src' => $icon(192), 'sizes' => '192x192']]];
+    $shortcuts[] = ['name' => 'Daily Challenges', 'url' => url('spin.php'), 'icons' => [['src' => $icon(192), 'sizes' => '192x192']]];
 }
 
 echo json_encode([

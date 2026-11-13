@@ -7,7 +7,7 @@ require_once __DIR__ . '/includes/auth.php';
 $A = require_admin();
 require_manage();
 
-$admin_title = 'Daily Spin';
+$admin_title = 'Daily Challenges';
 $admin_sub   = 'Prize segments, odds and payout history';
 
 if (!has_table('spin_results')) {

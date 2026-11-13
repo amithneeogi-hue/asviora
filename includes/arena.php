@@ -3,7 +3,7 @@
  * THE ARENA — one list, every playable thing.
  * ------------------------------------------------------------------
  * The site used to treat the three HTML5 games as "games" and put the Quiz
- * Contest and the Daily Spin in a separate band further down the page. From
+ * Contest and the Daily Challenges in a separate band further down the page. From
  * a player's point of view they are all just things to play, so this file
  * normalises all of them into one shape and renders them with one card, which
  * means the Games section shows five tiles instead of three.
@@ -66,7 +66,11 @@ function arena_items(string $cat = ''): array
                   WHERE s.game_id = ? ORDER BY s.score DESC LIMIT 1', [$g['id']]);
 
             $rows = [
-                ['Reward',    '+' . num($g['reward_coins']) . ' coins', 'gold'],
+                ['Reward',    match ((int) $g['reward_coins']) {
+                    100 => 'Earn Game Points',
+                    60  => 'Collect Game Points',
+                    default => '+' . num($g['reward_coins']) . ' coins',
+                }, 'gold'],
                 ['Top score', $best
                     ? num($best['score']) . ' <span class="text-dim">&middot; ' . e($best['username']) . '</span>'
                     : '&mdash;', ''],
@@ -169,7 +173,7 @@ function arena_items(string $cat = ''): array
             $cache[] = [
                 'kind'      => 'spin',
                 'key'       => 'spin',
-                'title'     => 'Daily Spin',
+                'title'     => 'Daily Challenges',
                 'tagline'   => ($perDay === 1 ? 'One free spin every day' : $perDay . ' free spins a day')
                              . ', no entry fee and nothing to lose. '
                              . 'The wheel resets at midnight — skip a day and that spin is gone.',
@@ -211,7 +215,7 @@ function arena_items(string $cat = ''): array
                 'key'       => 'chess',
                 'title'     => 'Chess',
                 'tagline'   => 'Play the engine for practice, or put coins on the table and '
-                             . 'challenge anyone with a link. Winner takes the pot.',
+                             . 'challenge anyone with a link. Climb the Leaderboard.',
                 'category'  => 'Strategy',
                 'icon'      => '&#9822;',
                 'thumb'     => url('assets/img/chess_icon.png'),

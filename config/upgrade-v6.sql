@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS `visit_daily` (
 -- -------------------------------------------------------------------
 -- 2. SPIN LIMITS
 --    Per-player overrides. NULL in any of these means "use the site
---    default from Admin -> Daily Spin".
+--    default from Admin -> Daily Challenges".
 -- -------------------------------------------------------------------
 ALTER TABLE `spin_access`
   ADD COLUMN `cooldown_minutes` INT UNSIGNED DEFAULT NULL COMMENT 'NULL = site default' AFTER `bonus_spins`;

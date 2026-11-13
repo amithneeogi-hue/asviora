@@ -574,7 +574,7 @@ V5SQL;
 function cpps_sql_files()
 {
     return array(
-        'upgrade-quiz-spin.sql'    => 'Quiz + Daily Spin er base table',
+        'upgrade-quiz-spin.sql'    => 'Quiz + Daily Challenges er base table',
         'upgrade-quiz-proctor.sql' => 'Quiz proctor (quiz_violations)',
         'upgrade-v5.sql'           => 'Modules, Spin Access, Quiz levels, Chess, API',
         'upgrade-v6.sql'           => 'Visitors, Spin limits, Govt Exam',
@@ -1208,7 +1208,7 @@ if ($pdo) {
           Checklist-er protita table ar column jaygamoto ache.
           Ekhon admin panel-e <code>Modules</code>, <code>Visitors</code>,
           <code>Spin Access</code>, <code>Govt Exam</code> ar
-          <code>Daily Spin &rarr; Spin limits</code> — sob dekhte paben.
+          <code>Daily Challenges &rarr; Spin limits</code> — sob dekhte paben.
           <br><br><strong>Ei file ta ekhon server theke delete kore din.</strong>
         </div>
       <?php elseif ($nMissing > 0): ?>
@@ -1309,7 +1309,7 @@ if ($pdo) {
 
       <p>
         <a class="btn ghost" href="admin/visitors.php">Admin &rarr; Visitors</a>
-        <a class="btn ghost" href="admin/spin.php">Admin &rarr; Daily Spin</a>
+        <a class="btn ghost" href="admin/spin.php">Admin &rarr; Daily Challenges</a>
         <a class="btn ghost" href="admin/govt-exam.php">Admin &rarr; Govt Exam</a>
       </p>
     <?php endif; ?>

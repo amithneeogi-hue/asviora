@@ -14,7 +14,7 @@ Ekta screen theke sob kichu live / hide:
 - prottek game (Cube3D, Memory, Sudoku, ba notun ja add korben)
 - Quiz Contest
 - Quiz level mode (on/off)
-- Daily Spin
+- Daily Challenges
 - Chess (puro), Chess vs computer, Chess challenges — alada alada switch
 
 "Everything live" / "Hide everything" button diye ek click e sob.
@@ -51,9 +51,9 @@ Template chaile: Import page → "Download CSV template".
 - Question "burn" hoy deal-er somoy — mane round chere diye palanor niyom nei
 - Admin → Quiz Levels → prottek player-er progress + "Levels" / "History" reset button
 
-## 5. Daily Spin access
+## 5. Daily Challenges access
 
-- Admin → Daily Spin → mode: **Everyone** ba **Only players I assign**
+- Admin → Daily Challenges → mode: **Everyone** ba **Only players I assign**
 - Username / email diye allow ba block
 - Admin → Players tabil-e prottek player-er pashe "Spin" dropdown (Site rule / Allowed / Blocked)
 - Block kora player api/spin.php theke o 403 pabe

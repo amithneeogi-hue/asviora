@@ -3,7 +3,7 @@ require_once __DIR__ . '/config/config.php';
 
 $page_title = '';
 
-// The three HTML5 games, the Quiz Contest and the Daily Spin, all normalised
+// The three HTML5 games, the Quiz Contest and the Daily Challenges, all normalised
 // into one list so they render as one set of five tiles — see includes/arena.php.
 $arena   = arena_items();
 
@@ -40,10 +40,10 @@ require __DIR__ . '/includes/header.php';
 <section class="hero">
   <div class="container hero-grid">
     <div>
-      <span class="eyebrow reveal in">100% skill &middot; 0% luck</span>
+      <span class="eyebrow reveal in">Skill, Logic & Knowledge</span>
       <h1 class="reveal in">
-        Play smart.<br>
-        <span class="gradient-text">Win on skill</span>&nbsp;alone.
+        Play Smart.<br>
+        <span class="gradient-text">Challenge Your Mind</span>
       </h1>
       <p class="hero-lead reveal in">
         <?= e(setting('site_name', 'Aegis Esports')) ?> is a skill-based arena built around logic,
@@ -51,7 +51,7 @@ require __DIR__ . '/includes/header.php';
         &mdash; just you, the clock and the leaderboard.
       </p>
       <div class="hero-actions reveal in">
-        <a href="<?= url('games.php') ?>" class="btn btn-primary btn-lg">&#127918; Start Playing Free</a>
+        <a href="<?= url('games.php') ?>" class="btn btn-primary btn-lg">&#127918; Start Playing Today</a>
         <?php if ($quizOn): ?>
           <a href="<?= url('quiz.php') ?>" class="btn btn-gold btn-lg">&#129504; Quiz Contest</a>
         <?php else: ?>

@@ -200,7 +200,7 @@ Admin panel-e login kora thakle key chharai chole.
 - [ ] Site → **Quiz** → level map (chip) dekha jacche, Level 1 khela jacche
 - [ ] Site → **Chess** → computer-er sathe ek game
 - [ ] 2 ta test account diye ek ta stake match (link share kore)
-- [ ] Admin → **Daily Spin** → access mode dekhe nin
+- [ ] Admin → **Daily Challenges** → access mode dekhe nin
 - [ ] `gamssmigration.php` delete kora hoyeche
 
 ---

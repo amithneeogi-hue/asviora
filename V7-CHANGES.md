@@ -45,7 +45,7 @@ ar live site e kivabe upload korben.
 
 ## 3. Game subscription (per-game plan)
 
-- **Admin → Game Plans**: protita game (3D Cube, Memory, Sudoku, Chess) + Quiz Contest + Daily Spin —
+- **Admin → Game Plans**: protita game (3D Cube, Memory, Sudoku, Chess) + Quiz Contest + Daily Challenges —
   **Free / Paid** tick, **dam (₹)**, **koto din** (0 = lifetime), plan er naam (e.g. "Monthly pass").
 - Paid game e website o app e **🔒 ₹49 / 1 month** tag, button e **"Unlock ₹49"**.
 - Pass thakle tag e **"✓ Pass till 05 Nov"**. Meyad sesh howar age abar kinle din gulo **jog** hoy.

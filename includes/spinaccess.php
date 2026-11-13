@@ -24,7 +24,7 @@ function spin_default_per_day(): int
 }
 
 /**
- * ---- Site-wide limits (Admin -> Daily Spin -> Spin limits) ----------
+ * ---- Site-wide limits (Admin -> Daily Challenges -> Spin limits) ----------
  * A player row on `spin_access` may override any of these; a NULL there
  * means "use the site value below". 0 always means "no limit".
  */

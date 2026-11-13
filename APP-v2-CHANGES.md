@@ -109,7 +109,7 @@ game er asset, `<base href>`, sob kichu jemon chilo temon-i chole.
 1. **XAMPP e (debug build):** app e login → **Games** tab → je kono game e tap.
    Board asa uchit, login form na. Na ele: `includes/appframe.php` upload
    hoyeche kina ar `settings` e `app_frame_secret` toiri hoyeche kina dekhun.
-2. **Spin:** Admin → Daily Spin → Spin limits e cooldown 2 minute korun.
+2. **Spin:** Admin → Daily Challenges → Spin limits e cooldown 2 minute korun.
    App e ekbar spin korun → button e "Next spin in 1m 58s" countdown cholbe,
    niche weekly/monthly line dekhabe.
 3. **Govt Exam:** Admin → Modules e `govt_exam` on ache kina dekhun. Home tab e

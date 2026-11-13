@@ -236,7 +236,7 @@ function pay_item_info(string $key): array
         $thumb = game_thumb($key, $g['thumbnail']);
         return ['title' => $g['title'], 'thumb' => $thumb, 'icon' => $g['icon'] ?: '&#127918;'];
     }
-    $names = ['quiz' => 'Quiz Contest', 'spin' => 'Daily Spin', 'chess' => 'Chess'];
+    $names = ['quiz' => 'Quiz Contest', 'spin' => 'Daily Challenges', 'chess' => 'Chess'];
     return ['title' => $names[$key] ?? ucfirst($key), 'thumb' => null, 'icon' => '&#127918;'];
 }
 

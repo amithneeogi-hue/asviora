@@ -102,7 +102,7 @@ $healthy = $upToDate && $allThere && $ledgerOk;
 
     <?php if ($healthy): ?>
       <div class="alert alert-success" data-persist="1"><span>&#10003;</span>
-        Everything is applied. Quiz and Daily Spin are live.</div>
+        Everything is applied. Quiz and Daily Challenges are live.</div>
     <?php else: ?>
       <div class="alert alert-error" data-persist="1"><span>&#9888;</span>
         Something is still missing — use the button below to re-run.</div>

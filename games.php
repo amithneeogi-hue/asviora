@@ -15,7 +15,7 @@ if (!(setting('seo_public_catalogue', '0') === '1' && !is_logged_in())) {
 
 $page_title = 'Play Skill Games Online';
 $page_desc  = 'Play online skill games on ' . setting('site_name', 'Asviora Games')
-            . ' — 3D Cube Solver, Memory Match, Sudoku, Chess, Quiz Contest and Daily Spin. '
+            . ' — 3D Cube Solver, Memory Match, Sudoku, Chess, Quiz Contest and Daily Challenges. '
             . 'Free in your browser or on Android.';
 $seo_keywords = 'online skill games, play games online, sudoku online, memory match, '
               . '3d cube solver, chess online, quiz contest, daily spin, browser games, android games';

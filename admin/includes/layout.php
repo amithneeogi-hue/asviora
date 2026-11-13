@@ -60,7 +60,7 @@ if (admin_can_manage()) {
         $contest[] = ['quiz-categories.php', '&#127991;', 'Quiz Topics',    null];
     }
     if (has_table('spin_results')) {
-        $contest[] = ['spin.php', '&#127920;', 'Daily Spin', null];
+        $contest[] = ['spin.php', '&#127920;', 'Daily Challenges', null];
         if (has_table('spin_access')) {
             $contest[] = ['spin-access.php', '&#128273;', 'Spin Access', null];
         }

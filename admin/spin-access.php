@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_ok()) {
                 'valid_from'    => post('valid_from') ?: null,
                 'valid_until'   => post('valid_until') ?: null,
                 'note'          => post('note'),
-                // blank = follow the site limit set in Admin -> Daily Spin
+                // blank = follow the site limit set in Admin -> Daily Challenges
                 'cooldown_minutes' => post('cooldown_minutes'),
                 'weekly_cap'       => post('weekly_cap'),
                 'monthly_cap'      => post('monthly_cap'),
@@ -268,7 +268,7 @@ require __DIR__ . '/includes/layout.php';
         </div>
         <p class="form-hint" style="margin-top:-6px">
           Leave these three blank to follow the site limits from
-          <a href="<?= admin_url('spin.php') ?>">Daily Spin</a>. 0 means "no limit for this player".
+          <a href="<?= admin_url('spin.php') ?>">Daily Challenges</a>. 0 means "no limit for this player".
         </p>
 
         <div class="form-group">

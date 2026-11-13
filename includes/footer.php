@@ -65,7 +65,7 @@ $footGames = array_slice(arena_items(), 0, 6);
             <li><a href="<?= url('quiz.php') ?>">Quiz Contest</a></li>
           <?php endif; ?>
           <?php if (spin_on()): ?>
-            <li><a href="<?= url('spin.php') ?>">Daily Spin</a></li>
+            <li><a href="<?= url('spin.php') ?>">Daily Challenges</a></li>
           <?php endif; ?>
           <?php if (govt_exam_in_nav()): ?>
             <li><a href="<?= url('govt-exam.php') ?>">

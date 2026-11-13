@@ -18,7 +18,7 @@ Ei document e ache: kon file **notun**, kon file **modify** hoyeche, database e 
 
    Page ta age dekhabe ki ki ache / nei. Tarpor **"Migration chalao →"** button e click korun.
 4. Sob `done` / `ok` dekhale — **`cppsmigration.php` file ta server theke DELETE kore din.**
-5. Admin panel e giye dekhun: `Visitors`, `Govt Exam`, ar `Daily Spin → Spin limits`.
+5. Admin panel e giye dekhun: `Visitors`, `Govt Exam`, ar `Daily Challenges → Spin limits`.
 
 > Migration ta auto-o chole: `includes/migrate.php` e `SCHEMA_VERSION` 6 kora ache, tai
 > site er je kono page ekbar khullei `config/upgrade-v6.sql` nijei apply hoye jabe.
@@ -104,7 +104,7 @@ Ei document e ache: kon file **notun**, kon file **modify** hoyeche, database e 
 
 ## 5. Feature gulo kivabe kaj kore
 
-### Daily spin limit — Admin → Daily Spin → *Spin limits*
+### Daily spin limit — Admin → Daily Challenges → *Spin limits*
 
 - **Spins per player per day** — 0 dile keu spin korte parbe na (page ta lukono lage na).
 - **Wait between spins (minutes)** — 0 = no wait. Per-day 3 dile ar 60 min gap dile,

@@ -1,5 +1,5 @@
 -- ===================================================================
--- AEGIS ESPORTS  |  Upgrade: Quiz Contest + Daily Spin Wheel
+-- AEGIS ESPORTS  |  Upgrade: Quiz Contest + Daily Challenges Wheel
 -- -------------------------------------------------------------------
 -- Run this ONCE on an existing install:
 --   mysql -u root -p asviora_games < config/upgrade-quiz-spin.sql

@@ -96,7 +96,7 @@ Admin side:
   gets told where to stop. The once-a-day rule is a unique database key on
   `(user_id, spin_date)`, so refreshing, double-clicking or opening a second tab
   cannot produce a second payout.
-- **Admin → Contests → Daily Spin** — edit coin amounts, weights and colours per
+- **Admin → Contests → Daily Challenges** — edit coin amounts, weights and colours per
   slice, see live odds, payout totals and recent spins. Weight `0` removes a
   slice; two blank rows are always available for adding new ones.
 

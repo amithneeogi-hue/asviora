@@ -489,7 +489,7 @@ body.nav-open { overflow: hidden; }
 }
 
 /* ------------------------------------------------------------------
-   ARENA TILES — the Quiz and the Daily Spin use the same card as the
+   ARENA TILES — the Quiz and the Daily Challenges use the same card as the
    three HTML5 games (see includes/arena.php) so all five read as one
    set. These two rules only tint them so they are still recognisable
    at a glance: quiz = green, spin = gold.

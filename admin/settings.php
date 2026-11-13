@@ -149,7 +149,7 @@ require __DIR__ . '/includes/layout.php';
           </div>
           <p class="form-hint mt-2">
             Prize amounts and odds for the wheel live on the
-            <a href="<?= admin_url('spin.php') ?>">Daily Spin</a> page.
+            <a href="<?= admin_url('spin.php') ?>">Daily Challenges</a> page.
             Questions live in the <a href="<?= admin_url('quiz.php') ?>">question bank</a>.
           </p>
         </div>

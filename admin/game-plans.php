@@ -33,7 +33,7 @@ function plan_items(): array
                         'icon' => '&#129504;', 'live' => quiz_on()];
     }
     if (has_table('spin_results')) {
-        $out['spin'] = ['title' => 'Daily Spin', 'cat' => 'Rewards', 'thumb' => game_thumb('spin'),
+        $out['spin'] = ['title' => 'Daily Challenges', 'cat' => 'Rewards', 'thumb' => game_thumb('spin'),
                         'icon' => '&#127920;', 'live' => spin_on()];
     }
     if (!isset($out['chess']) && function_exists('chess_on')) {

@@ -41,7 +41,7 @@ if ($enabled) {
     }
 }
 
-$page_title = 'Free Daily Spin & Win Coins';
+$page_title = 'Free Daily Challenges & Win Coins';
 $page_desc  = 'One free daily spin on Asviora Games. Win up to 1,000 coins - no entry fee, '
             . 'no catch, just a daily chance to boost your balance.';
 $seo_keywords = 'daily spin, free spin, spin and win, win coins, daily rewards, free coins, '
@@ -53,7 +53,7 @@ $n = count($segments);
 
 <section class="page-hero">
   <div class="container">
-    <div class="crumb"><a href="<?= url('index.php') ?>">Home</a> &rsaquo; Daily Spin</div>
+    <div class="crumb"><a href="<?= url('index.php') ?>">Home</a> &rsaquo; Daily Challenges</div>
     <h1>Daily <span class="gradient-text">Spin</span></h1>
     <p>One free spin every day. The wheel resets at midnight &mdash; miss a day and it is gone.</p>
   </div>

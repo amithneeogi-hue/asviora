@@ -390,7 +390,7 @@ function quiz_player_stage(int $userId, int $catId = 0): array
 // ===================================================================
 
 /**
- * May this player use the Daily Spin?
+ * May this player use the Daily Challenges?
  * Site-wide mode is either "all" or "assigned"; the per-player setting
  * (Admin -> Players) overrides it in both directions.
  */

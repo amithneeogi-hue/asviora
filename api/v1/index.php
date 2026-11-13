@@ -257,7 +257,7 @@ case 'games': {
 
 /**
  * v7 — the whole arena, exactly as games.php shows it: the HTML5 games
- * plus the Quiz Contest, the Daily Spin and Chess, each with its picture,
+ * plus the Quiz Contest, the Daily Challenges and Chess, each with its picture,
  * its price tag and whether this player has a pass.
  */
 case 'arena': {
@@ -269,7 +269,7 @@ case 'arena': {
     }
     $extra = [
         'quiz' => [quiz_on(), 'Quiz Contest', 'Timed questions across Easy, Mid and Hard. Every right answer pays coins.', 'Quiz', '🧠'],
-        'spin' => [spin_on(), 'Daily Spin', 'Free spins every day — up to big coin prizes.', 'Rewards', '🎰'],
+        'spin' => [spin_on(), 'Daily Challenges', 'Free spins every day — up to big coin prizes.', 'Rewards', '🎰'],
     ];
     foreach ($extra as $key => [$on, $title, $tag, $cat, $icon]) {
         if (!$on) {
