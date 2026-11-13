@@ -128,6 +128,10 @@ track_visit($page_title ?? null);
       opacity: .92
     }
   </style>
+  <?php if (ads_enabled() && ads_client_id() !== ''): ?>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=<?= e(ads_client_id()) ?>"
+          crossorigin="anonymous"></script>
+  <?php endif; ?>
   <?= $extra_head ?? '' ?>
 </head>
 <?php

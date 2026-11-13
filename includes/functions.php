@@ -178,7 +178,12 @@ function ads_enabled(): bool
 /** AdSense publisher client ID (ca-pub-XXXX). Empty means ads stay off. */
 function ads_client_id(): string
 {
-    return trim(setting('ads_client_id'));
+    $id = trim(setting('ads_client_id'));
+    if ($id === '') {
+        // Default publisher ID supplied for AdSense verification.
+        $id = 'ca-pub-1911098914909566';
+    }
+    return $id;
 }
 
 /** Ad slot for a placement key (ads_slot_home, ads_slot_games, ...). Blank hides it. */
