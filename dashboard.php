@@ -337,7 +337,7 @@ require __DIR__ . '/includes/header.php';
 
         <?php if ($dashSpin): ?>
         <div class="card">
-          <h3 style="font-size:1.08rem">&#127920; Daily spin</h3>
+          <h3 style="font-size:1.08rem">&#127920; Daily Challenges</h3>
           <p class="text-muted" style="font-size:.9rem">
             One free spin a day. The wheel resets at midnight.</p>
           <div class="kv"><span class="k">Total won</span>

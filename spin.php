@@ -1,6 +1,6 @@
 <?php
 /**
- * Daily spin wheel — one free spin per player per day.
+ * Daily challenge wheel — one free challenge per player per day.
  */
 require_once __DIR__ . '/config/config.php';
 
@@ -41,11 +41,10 @@ if ($enabled) {
     }
 }
 
-$page_title = 'Free Daily Challenges & Win Coins';
-$page_desc  = 'One free daily spin on Asviora Games. Win up to 1,000 coins - no entry fee, '
+$page_title = 'Free Daily Challenges';
+$page_desc  = 'One free daily challenge on Asviora Games. Earn game points each day - no entry fee, '
             . 'no catch, just a daily chance to boost your balance.';
-$seo_keywords = 'daily spin, free spin, spin and win, win coins, daily rewards, free coins, '
-              . 'online spin game, play spin online';
+$seo_keywords = 'daily challenges, daily rewards, game points, online skill game, play online';
 require __DIR__ . '/includes/header.php';
 
 $n = count($segments);
@@ -54,8 +53,8 @@ $n = count($segments);
 <section class="page-hero">
   <div class="container">
     <div class="crumb"><a href="<?= url('index.php') ?>">Home</a> &rsaquo; Daily Challenges</div>
-    <h1>Daily <span class="gradient-text">Spin</span></h1>
-    <p>One free spin every day. The wheel resets at midnight &mdash; miss a day and it is gone.</p>
+    <h1>Daily <span class="gradient-text">Challenges</span></h1>
+    <p>One free challenge every day. The wheel resets at midnight &mdash; miss a day and it is gone.</p>
   </div>
 </section>
 
@@ -67,7 +66,7 @@ $n = count($segments);
       <div class="card empty">
         <div class="em-ico">&#127920;</div>
         <h3>The wheel is resting</h3>
-        <p>The daily spin is switched off or not installed yet. Check back soon.</p>
+        <p>The daily challenge is switched off or not installed yet. Check back soon.</p>
         <a class="btn btn-primary" href="<?= url('games.php') ?>">Play a game instead</a>
       </div>
 
@@ -170,7 +169,7 @@ $n = count($segments);
 
         <div>
           <div class="card mb-3">
-            <h3 style="font-size:1.05rem">Prize table</h3>
+            <h3 style="font-size:1.05rem">Reward table</h3>
             <ul class="spin-prizes">
               <?php foreach ($segments as $s): ?>
                 <li>

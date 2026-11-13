@@ -143,7 +143,7 @@ function arena_items(string $cat = ''): array
             ];
         }
 
-        /* ---------------- daily spin ---------------- */
+        /* ---------------- daily challenges ---------------- */
         if (spin_on()) {
             $segs = spin_segments();
             $top  = 0;
@@ -168,7 +168,7 @@ function arena_items(string $cat = ''): array
                            $today ? 'Used &middot; +' . num($today['coins']) . ' coins' : 'Available',
                            $today ? '' : 'green'];
             }
-            $rows[] = ['Biggest win so far', $record ? '+' . num($record) . ' coins' : '&mdash;', 'gold'];
+            $rows[] = ['Highest reward so far', $record ? '+' . num($record) . ' coins' : '&mdash;', 'gold'];
 
             $cache[] = [
                 'kind'      => 'spin',

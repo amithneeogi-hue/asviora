@@ -62,7 +62,7 @@ if ($for === 'registration') {
     $key     = null;
     $perks   = [
         'Unlocks your account on the website and in the app',
-        'All free games, the quiz and the daily spin open straight away',
+        'All free games, the quiz and the daily challenges open straight away',
         'Paid once — never charged again',
     ];
 } else {

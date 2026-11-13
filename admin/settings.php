@@ -144,7 +144,7 @@ require __DIR__ . '/includes/layout.php';
             <label class="check">
               <input type="checkbox" name="spin_enabled" value="1"
                      <?= setting('spin_enabled', '1') === '1' ? 'checked' : '' ?>>
-              <span><strong>Daily spin</strong> — allow one free spin per player per day</span>
+              <span><strong>Daily Challenges</strong> — allow one free spin per player per day</span>
             </label>
           </div>
           <p class="form-hint mt-2">

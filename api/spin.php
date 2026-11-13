@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     out(['ok' => false, 'message' => 'POST only.'], 405);
 }
 if (!spin_on()) {
-    out(['ok' => false, 'message' => 'The daily spin is not available right now.'], 403);
+    out(['ok' => false, 'message' => 'The daily challenge is not available right now.'], 403);
 }
 if (!is_logged_in()) {
     out(['ok' => false, 'message' => 'Please log in first.', 'redirect' => url('login.php')], 401);

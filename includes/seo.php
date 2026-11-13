@@ -83,11 +83,11 @@ function seo_default_meta(string $key): array
         'home'        => [seo_home_title_default($site, setting('site_tagline', 'Where Skill Wins')), setting('site_description'),
                           setting('seo_keywords')],
         'games'       => ['Play Skill Games Online', 'Play online skill games on ' . $site . ' — 3D Cube Solver, Memory Match, Sudoku, Chess, Quiz Contest and Daily Challenges. Free in your browser or on Android.',
-                          'online skill games, play games online, sudoku online, memory match, 3d cube solver, chess online, quiz contest, daily spin, browser games, android games'],
+                          'online skill games, play games online, sudoku online, memory match, 3d cube solver, chess online, quiz contest, daily challenges, browser games, android games'],
         'quiz'        => ['Play Online Quiz Contest', 'Play the online quiz contest — clear a level to open the next, with your own set of questions.',
                           'online quiz contest, quiz game, play quiz online, quiz levels, general knowledge quiz, gk quiz, competitive exam quiz, brain quiz'],
-        'spin'        => ['Free Daily Challenges & Win Coins', 'One free daily spin on ' . $site . '. Win up to 1,000 coins - no entry fee, no catch, just a daily chance to boost your balance.',
-                          'daily spin, free spin, spin and win, win coins, daily rewards, free coins, online spin game, play spin online'],
+        'spin'        => ['Free Daily Challenges', 'One free daily challenge on ' . $site . '. Earn game points each day - no entry fee, no catch, just a daily chance to boost your balance.',
+                          'daily challenges, daily rewards, game points, online skill game, play online'],
         'chess'       => ['Play Chess Online', 'Play chess online against the computer, or put coins on the table and challenge anyone with a link on ' . $site . '. Climb the Leaderboard.',
                           'play chess online, online chess, chess game, chess vs computer, multiplayer chess, chess challenge, chess with coins, free chess online'],
         'leaderboard' => ['Game Leaderboard & Rankings', 'Live game leaderboards for every ' . $site . ' title — daily, weekly and all-time rankings.',
@@ -491,7 +491,7 @@ function seo_ai_suggest(string $label, string $pageUrl, array $current, string $
     $focus = setting('seo_ai_focus', 'skill games, quiz, India');
 
     $prompt = "You are an SEO specialist writing meta tags for a page on \"{$site}\", "
-        . "a skill-gaming website (browser games, quiz contest, daily spin, chess) for players in India.\n\n"
+        . "a skill-gaming website (browser games, quiz contest, daily challenges, chess) for players in India.\n\n"
         . "Page: {$label}\nURL: {$pageUrl}\n"
         . "Current title: " . ($current['title'] ?? '') . "\n"
         . "Current description: " . ($current['description'] ?? '') . "\n"

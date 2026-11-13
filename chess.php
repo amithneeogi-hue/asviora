@@ -98,7 +98,7 @@ require __DIR__ . '/includes/header.php';
         <div class="game-body">
           <h3>&#127942; Challenge a player</h3>
           <p class="text-muted">Both players put in the same number of coins. Pick a clock,
-             share the link, and the winner takes everything on the table.</p>
+             share the link, and the winner receives the full pot.</p>
 
           <?php if (!$uid): ?>
             <p class="text-muted">You need an account to stake coins.</p>
@@ -177,7 +177,7 @@ require __DIR__ . '/includes/header.php';
             <h3><?= e($m['username']) ?></h3>
             <div class="kv"><span class="k">Stake each</span>
               <span class="v text-gold"><?= num($m['stake']) ?> coins</span></div>
-            <div class="kv"><span class="k">Winner takes</span>
+            <div class="kv"><span class="k">Total pot</span>
               <span class="v text-green"><?= num($m['stake'] * 2) ?> coins</span></div>
             <div class="kv"><span class="k">Clock</span><span class="v"><?= (int) $m['minutes'] ?> min each</span></div>
             <a class="btn btn-primary btn-sm mt-2"

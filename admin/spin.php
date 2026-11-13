@@ -364,7 +364,7 @@ $overrides   = spin_limits_installed()
         <div class="form-group">
           <label class="check">
             <input type="checkbox" name="spin_enabled" value="1" <?= $enabled ? 'checked' : '' ?>>
-            <span>Daily spin is live on the site</span>
+            <span>Daily Challenges is live on the site</span>
           </label>
         </div>
 

@@ -107,7 +107,7 @@ require __DIR__ . '/includes/header.php';
               <h3>Match <?= e($match['code']) ?></h3>
               <div class="kv"><span class="k">Stake each</span>
                 <span class="v text-gold"><?= num($match['stake']) ?></span></div>
-              <div class="kv"><span class="k">Winner takes</span>
+              <div class="kv"><span class="k">Total pot</span>
                 <span class="v text-green" id="potView"><?= num($match['pot'] ?: $match['stake'] * 2) ?></span></div>
               <div class="kv"><span class="k">Clock</span>
                 <span class="v"><?= (int) $match['minutes'] ?> min each</span></div>

@@ -245,7 +245,7 @@ require __DIR__ . '/includes/header.php';
         <?php
         $steps = [
           ['Register free', 'Pick a username, set a password, done. You get ' . num((int) setting('signup_bonus', '500')) . ' welcome coins instantly.'],
-          ['Choose how to play', 'Cube, memory, sudoku, the timed quiz or the daily spin &mdash; all in one arena.'],
+          ['Choose how to play', 'Cube, memory, sudoku, the timed quiz or the daily challenges &mdash; all in one arena.'],
           ['Play and score', 'Your result is validated server-side and turned into points, coins and XP.'],
           ['Climb the board', 'Beat your best, pass other players, and hold the top spot as long as you can.'],
         ];

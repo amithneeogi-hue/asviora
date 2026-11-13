@@ -32,7 +32,7 @@
     <string name="play_now">Play now</string>
     <string name="see_all">See all</string>
     <string name="game_arena">Game Arena</string>
-    <string name="game_arena_sub">Pick a game, beat your best, earn coins</string>
+    <string name="game_arena_sub">Pick a game, beat your best, earn game points</string>
     <string name="leave_title">Leave this game?</string>
     <string name="leave_body">Your current round will not be saved.</string>
     <string name="leave_yes">Leave</string>
@@ -41,8 +41,8 @@
     <string name="restart_body">The board reloads and this round starts over.</string>
     <string name="restart_yes">Restart</string>
     <string name="quiz_title">Quiz Arena</string>
-    <string name="spin_title">Lucky Spin</string>
-    <string name="spin_sub">Spin daily. Win coins.</string>
+    <string name="spin_title">Daily Challenges</string>
+    <string name="spin_sub">Play daily. Earn game points.</string>
 
     <!-- v4 — payments -->
     <string name="secure_payment">Secure payment</string>
