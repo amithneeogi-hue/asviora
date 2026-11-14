@@ -12,10 +12,15 @@ DirectoryIndex index.php index.html
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  # Canonical host/protocol: non-www HTTPS only
-  RewriteCond %{HTTP_HOST} ^www\.asviora\.in$ [NC,OR]
-  RewriteCond %{HTTPS} off
+  # Canonical host/protocol: non-www HTTPS only.
+  # Forwarded-proto aware so we don't loop behind a reverse proxy /
+  # CDN that terminates TLS and forwards plain HTTP to Apache.
+  RewriteCond %{HTTP_HOST} ^www\.asviora\.in$ [NC]
   RewriteRule ^ https://asviora.in%{REQUEST_URI} [L,R=301]
+
+  RewriteCond %{HTTPS} off
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
   # v7 SEO — /sitemap.xml and /robots.txt are built by PHP from the
   # SEO manager settings (sitemap.php / robots.php)

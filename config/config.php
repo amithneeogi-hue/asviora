@@ -47,7 +47,8 @@ define('DB_CHARSET', 'utf8mb4');
 // ---------- Site ----------
 // Base URL of the site. Leave as auto-detect, or hardcode e.g. 'http://localhost/games'
 define('SITE_URL', (function () {
-    $https  = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+    $https  = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
     $scheme = $https ? 'https' : 'http';
     $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
     $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
