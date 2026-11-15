@@ -404,6 +404,25 @@ function pay_mark_paid(array $p, string $gwPaymentId = '', array $meta = []): bo
             sub_grant((int) $p['user_id'], (string) $p['item_key'],
                       (int) ($p['plan_days'] ?? 30), (int) $p['id'], 'payment');
         }
+        if ($p['purpose'] === 'deposit') {
+            $meta = [];
+            if (!empty($p['meta'])) {
+                $dec = json_decode((string) $p['meta'], true);
+                if (is_array($dec)) $meta = $dec;
+            }
+            $coins  = max(0, (int) ($meta['coins'] ?? 0));
+            $bonus  = max(0, (int) ($meta['bonus_coins'] ?? 0));
+            $total  = $coins + $bonus;
+            if ($total > 0) {
+                // first deposit unlocks the locked bonus bucket
+                $wasFirst = !user_has_deposited((int) $p['user_id']);
+                if ($wasFirst) {
+                    unlock_bonus_coins((int) $p['user_id']);
+                }
+                add_coins((int) $p['user_id'], $total, 'deposit',
+                          'Coin top-up — ' . money((int) $p['amount_paise'], $p['currency']));
+            }
+        }
         $pdo->commit();
     } catch (Throwable $e) {
         if ($pdo->inTransaction()) {
@@ -605,6 +624,9 @@ function cf_paid_payment_id(string $orderRef): string
 /** A signed pay.php URL the app can open in its WebView. */
 function app_pay_url(int $userId, string $for, string $item = ''): string
 {
+    if ($for === 'deposit') {
+        return url('deposit.php?app=1&t=' . urlencode(app_frame_ticket($userId, 'pay')));
+    }
     return url('pay.php?for=' . urlencode($for)
              . ($item !== '' ? '&item=' . urlencode($item) : '')
              . '&app=1&t=' . urlencode(app_frame_ticket($userId, 'pay')));

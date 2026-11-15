@@ -155,9 +155,13 @@ require __DIR__ . '/includes/header.php';
         <?php endif; ?>
       </div>
       <div class="row" style="gap:9px">
-        <span class="coin-pill">&#129689; <?= num($me['coins']) ?> coins</span>
+        <span class="coin-pill">&#129689; <?= num(user_spendable_coins($me)) ?> coins</span>
+        <?php if ((int) ($me['locked_coins'] ?? 0) > 0): ?>
+          <span class="badge" title="Unlocks after your first deposit"><?= num((int) $me['locked_coins']) ?> locked</span>
+        <?php endif; ?>
         <span class="badge badge-green">Level <?= (int) $me['level'] ?></span>
         <span class="badge badge-gold">Rank #<?= $rank ?></span>
+        <a href="<?= url('deposit.php') ?>" class="btn btn-gold btn-xs">Top up coins</a>
       </div>
     </div>
 

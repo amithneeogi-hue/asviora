@@ -180,15 +180,14 @@ case 'auth/register': {
         'email'         => $email,
         'phone'         => $phone ?: null,
         'password_hash' => password_hash($pass, PASSWORD_BCRYPT),
-        'coins'         => $bonus,
+        'coins'         => 0,
+        'locked_coins'  => 0,
+        'has_deposited' => 0,
         'referral_code' => strtoupper(substr(bin2hex(random_bytes(5)), 0, 8)),
         'referred_by'   => $refBy ? (int) $refBy : null,
     ]);
 
-    insert_row('coin_transactions', [
-        'user_id' => $uid, 'amount' => $bonus, 'balance' => $bonus,
-        'type' => 'signup', 'note' => 'Welcome bonus (app)',
-    ]);
+    add_locked_coins($uid, $bonus, 'signup', 'Welcome bonus (locked until first deposit) (app)');
 
     if ($refBy) {
         $rBonus = (int) setting('referral_bonus', '200');
@@ -297,7 +296,8 @@ case 'arena': {
 
 case 'pay/link': {
     $u   = api_require_user();
-    $for = api_str('for') === 'game' ? 'game' : 'registration';
+    $forRaw = api_str('for');
+    $for = in_array($forRaw, ['game', 'deposit'], true) ? $forRaw : 'registration';
     $item = preg_replace('/[^a-z0-9_\-]/i', '', api_str('item'));
     if (!function_exists('pay_enabled') || !payments_ready()) {
         api_fail('module_off', 'Payments are not switched on.', 403);
@@ -356,6 +356,24 @@ case 'games/ticket': {
         api_fail('not_found', 'That game is not available.', 404);
     }
     api_require_access($u, (string) $game['slug']);          // v7
+
+    // v8 — entry-fee gate
+    $entry = (int) ($game['entry_coins'] ?? 0);
+    if ($entry > 0) {
+        if (!user_has_deposited((int) $u['id'])) {
+            api_fail('deposit_required', 'Make your first deposit to unlock your bonus and play this game.', 402,
+                     ['pay_url' => app_pay_url((int) $u['id'], 'deposit')]);
+        }
+        $spendable = user_spendable_coins($u);
+        if ($spendable < $entry) {
+            api_fail('insufficient_coins', 'You need ' . $entry . ' coins to play. Top up your wallet.', 402,
+                     ['pay_url' => app_pay_url((int) $u['id'], 'deposit')]);
+        }
+        if (!deduct_entry_fee((int) $u['id'], $entry, (string) $game['slug'])) {
+            api_fail('insufficient_coins', 'You need ' . $entry . ' coins to play. Top up your wallet.', 402,
+                     ['pay_url' => app_pay_url((int) $u['id'], 'deposit')]);
+        }
+    }
 
     api_ok([
         'game'     => api_game_public($game),

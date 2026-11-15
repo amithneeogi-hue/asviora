@@ -58,13 +58,14 @@ if (chess_on()) {
 
 // Government competitive exam — announced ahead of launch. The label,
 // the on/off switch and whether it still says "soon" all come from
-// Admin -> Govt Exam.
-if (govt_exam_in_nav()) {
-  $nav['govt-exam.php'] = setting('govt_exam_label', 'Govt Exam');
-  if (govt_exam_status() === 'soon') {
-    $navSoon['govt-exam.php'] = true;
-  }
-}
+// Admin -> Govt Exam. (commented out — Govt Exam hidden from header)
+// if (govt_exam_in_nav()) {
+//   $nav['govt-exam.php'] = setting('govt_exam_label', 'Govt Exam');
+//   if (govt_exam_status() === 'soon') {
+//     $navSoon['govt-exam.php'] = true;
+//   }
+// }
+
 
 $nav += [
   'leaderboard.php' => 'Leaderboard',

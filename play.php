@@ -24,6 +24,20 @@ if (!$game) {
 // if one is switched on). Sends the player to pay.php otherwise.
 require_game_access($game['slug']);
 
+// v8 — entry-fee gate: locked bonus coins unlock only after first deposit.
+$entry = (int) ($game['entry_coins'] ?? 0);
+if ($entry > 0) {
+    $me = current_user();
+    $spendable = $me ? user_spendable_coins($me) : 0;
+    if (!$me || !user_has_deposited((int) $me['id']) || $spendable < $entry) {
+        $_SESSION['redirect_after_pay'] = $_SERVER['REQUEST_URI'] ?? '';
+        flash('This game needs ' . num($entry) . ' coins to play. '
+            . (user_has_deposited((int) ($me['id'] ?? 0)) ? 'Top up your wallet.' : 'Make your first deposit to unlock your bonus and play.'),
+            'info');
+        redirect('deposit.php');
+    }
+}
+
 $page_title = $game['title'] . ' — Play Online';
 $descLead   = $game['tagline'] ? rtrim($game['tagline'], '. ') . '. ' : '';
 $page_desc  = trim($descLead
@@ -57,6 +71,16 @@ $_SESSION['play_tokens'][$game['slug']] = ['token' => $playToken, 'issued' => ti
 
 // count the play
 q('UPDATE games SET plays = plays + 1 WHERE id = ?', [$game['id']]);
+
+// v8 — deduct entry fee (coins) for entry-fee games
+$entry = (int) ($game['entry_coins'] ?? 0);
+if ($entry > 0) {
+    $me = current_user();
+    if ($me && !deduct_entry_fee((int) $me['id'], $entry, (string) $game['slug'])) {
+        flash('Could not deduct the entry fee. Please top up.', 'error');
+        redirect('deposit.php');
+    }
+}
 
 $board = fetch_all(
     'SELECT s.score, s.time_taken, s.difficulty, s.played_at, u.username, u.avatar, u.name

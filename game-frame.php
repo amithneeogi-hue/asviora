@@ -100,6 +100,37 @@ if (!$access['ok']) {
     exit;
 }
 
+/* ---------- v8: entry-fee gate ---------- */
+$entryFee = (int) ($game['entry_coins'] ?? 0);
+if ($entryFee > 0) {
+    $u = current_user();
+    $spendable = $u ? user_spendable_coins($u) : 0;
+    if (!$u || !user_has_deposited((int) $u['id']) || $spendable < $entryFee) {
+        http_response_code(402);
+        header('Content-Type: text/html; charset=utf-8');
+        $payUrl = url('deposit.php');
+        if (($_SESSION['via'] ?? '') === 'app' && is_logged_in()) {
+            $payUrl = app_pay_url((int) $_SESSION['user_id'], 'deposit');
+        }
+        echo '<!doctype html><html lang="en"><head><meta charset="utf-8">'
+           . '<meta name="viewport" content="width=device-width,initial-scale=1">'
+           . '<meta name="robots" content="noindex"><title>Top up coins</title><style>'
+           . 'html,body{height:100%;margin:0}body{display:grid;place-items:center;'
+           . 'background:#0b0c0e;color:#eaeee8;font:400 15px/1.55 system-ui,-apple-system,'
+           . 'Segoe UI,Roboto,sans-serif;text-align:center;padding:24px}'
+           . 'h1{font-size:1.15rem;margin:14px 0 6px}p{margin:0 0 18px;color:#a2ab99;max-width:420px}'
+           . 'a{display:inline-block;padding:11px 22px;border-radius:100px;font-weight:800;'
+           . 'text-decoration:none;background:linear-gradient(135deg,#b6e857,#5c9418);color:#0b0c0e}</style></head><body>'
+           . '<div><div style="font-size:2.4rem">&#128176;</div>'
+           . '<h1>Top up coins to play</h1><p>This game costs ' . num($entryFee) . ' coins. '
+           . (user_has_deposited((int) ($u['id'] ?? 0)) ? 'Top up your wallet.' : 'Make your first deposit to unlock your bonus and play.')
+           . '</p>'
+           . '<a href="' . e($payUrl) . '" target="_top">Top up now</a>'
+           . '</div></body></html>';
+        exit;
+    }
+}
+
 /* ---------- find its index.html, without leaving the games folder ---------- */
 // The path column is admin-editable, so it is treated as untrusted: realpath()
 // resolves any "../" in it and the prefix test throws out anything that lands

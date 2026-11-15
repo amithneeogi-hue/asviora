@@ -62,15 +62,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'phone'         => $old['phone'] !== '' ? $old['phone'] : null,
                 'password_hash' => password_hash($pass, PASSWORD_DEFAULT),
                 'coins'         => 0,
+                'locked_coins'  => 0,
+                'has_deposited' => 0,
                 'referral_code' => $code,
                 'referred_by'   => $referrer['id'] ?? null,
             ]);
 
-            add_coins($uid, $bonus, 'signup', 'Welcome bonus');
+            // Signup bonus goes into the LOCKED bucket — usable only after
+            // the player's first real deposit (deposit gate).
+            add_locked_coins($uid, $bonus, 'signup', 'Welcome bonus (locked until first deposit)');
             if ($referrer) {
                 add_coins((int) $referrer['id'], $refBonus, 'referral',
                           'Referred ' . $old['username']);
-                add_coins($uid, $refBonus, 'referral', 'Joined via referral');
+                add_locked_coins($uid, $refBonus, 'referral', 'Referral bonus (locked until first deposit)');
             }
 
             $_SESSION['user_id'] = $uid;

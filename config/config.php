@@ -161,6 +161,7 @@ require_once ROOT_PATH . '/includes/functions.php';
 require_once ROOT_PATH . '/includes/quiz.php';
 require_once ROOT_PATH . '/includes/chess.php';
 require_once ROOT_PATH . '/includes/arena.php';
+require_once ROOT_PATH . '/includes/tournament.php';
 
 // Apply any database migration the site has not seen yet. This is a no-op on
 // every request except the first one after an update — see includes/migrate.php.

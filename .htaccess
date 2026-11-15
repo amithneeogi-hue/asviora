@@ -15,9 +15,12 @@ DirectoryIndex index.php index.html
   # Canonical host/protocol: non-www HTTPS only.
   # Forwarded-proto aware so we don't loop behind a reverse proxy /
   # CDN that terminates TLS and forwards plain HTTP to Apache.
+  # On localhost / local IPs we keep HTTP (no SSL cert needed locally).
   RewriteCond %{HTTP_HOST} ^www\.asviora\.in$ [NC]
   RewriteRule ^ https://asviora.in%{REQUEST_URI} [L,R=301]
 
+  # Only force HTTPS on the live server, not on local dev machines.
+  RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1|192\.168\.[0-9.]+)(:\d+)?$ [NC]
   RewriteCond %{HTTPS} off
   RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

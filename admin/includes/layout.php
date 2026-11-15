@@ -85,6 +85,7 @@ if (admin_can_manage()) {
         $platform[] = ['group' => 'Payments', 'items' => [
             ['payments.php',   '&#128179;', 'Payments',   $pendingPay ?: null],
             ['game-plans.php', '&#127915;', 'Game Plans', null],
+            ['cube-tournament.php', '&#127942;', 'Cube Tournament', null],
         ]];
     }
 

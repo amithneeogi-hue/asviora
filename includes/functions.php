@@ -390,6 +390,104 @@ function add_coins(int $userId, int $amount, string $type, string $note = ''): i
     return $balance;
 }
 
+/** Add coins to the locked bucket (signup bonus before first deposit). */
+function add_locked_coins(int $userId, int $amount, string $type, string $note = ''): int
+{
+    q('UPDATE users SET locked_coins = GREATEST(0, locked_coins + ?) WHERE id = ?', [$amount, $userId]);
+    $balance = (int) fetch_col('SELECT locked_coins FROM users WHERE id = ?', [$userId], 0);
+    insert_row('coin_transactions', [
+        'user_id' => $userId,
+        'amount'  => $amount,
+        'balance' => $balance,
+        'type'    => $type,
+        'note'    => $note !== '' ? $note : null,
+    ]);
+    return $balance;
+}
+
+/** Has this user made at least one real deposit? */
+function user_has_deposited(int $userId): bool
+{
+    if ($userId <= 0) return false;
+    $u = fetch_one('SELECT has_deposited FROM users WHERE id = ?', [$userId]);
+    return (bool) ($u['has_deposited'] ?? 0);
+}
+
+/** Coins this user may actually spend right now. */
+function user_spendable_coins(?array $u): int
+{
+    if (!$u) return 0;
+    $coins  = (int) ($u['coins'] ?? 0);
+    $locked = (int) ($u['locked_coins'] ?? 0);
+    if (!empty($u['has_deposited'])) {
+        return $coins + $locked;
+    }
+    return $coins;
+}
+
+/** Move all locked bonus coins into the spendable bucket (first deposit). */
+function unlock_bonus_coins(int $userId): int
+{
+    $pdo = db();
+    $ownTx = !$pdo->inTransaction();
+    if ($ownTx) $pdo->beginTransaction();
+    try {
+        $u = fetch_one('SELECT locked_coins FROM users WHERE id = ? FOR UPDATE', [$userId]);
+        $locked = (int) ($u['locked_coins'] ?? 0);
+        if ($locked > 0) {
+            q('UPDATE users SET coins = coins + ?, locked_coins = 0 WHERE id = ?',
+              [$locked, $userId]);
+            $bal = (int) fetch_col('SELECT coins FROM users WHERE id = ?', [$userId], 0);
+            insert_row('coin_transactions', [
+                'user_id' => $userId, 'amount' => $locked, 'balance' => $bal,
+                'type' => 'unlock', 'note' => 'Bonus unlocked by first deposit',
+            ]);
+        }
+        q('UPDATE users SET has_deposited = 1 WHERE id = ?', [$userId]);
+        if ($ownTx) $pdo->commit();
+    } catch (Throwable $e) {
+        if ($ownTx && $pdo->inTransaction()) $pdo->rollBack();
+        throw $e;
+    }
+    return (int) fetch_col('SELECT coins FROM users WHERE id = ?', [$userId], 0);
+}
+
+/** Deduct an entry fee from the spendable wallet. Returns false if insufficient. */
+function deduct_entry_fee(int $userId, int $amount, string $gameSlug): bool
+{
+    if ($amount <= 0) return true;
+    $pdo = db();
+    $ownTx = !$pdo->inTransaction();
+    if ($ownTx) $pdo->beginTransaction();
+    try {
+        $u = fetch_one('SELECT coins, locked_coins, has_deposited FROM users WHERE id = ? FOR UPDATE', [$userId]);
+        $spendable = !empty($u['has_deposited'])
+            ? ((int)$u['coins'] + (int)$u['locked_coins'])
+            : (int)$u['coins'];
+        if ($spendable < $amount) {
+            if ($ownTx && $pdo->inTransaction()) $pdo->rollBack();
+            return false;
+        }
+        // spend from coins first, then locked
+        $coins  = (int) $u['coins'];
+        $locked = (int) $u['locked_coins'];
+        $fromCoins  = min($coins, $amount);
+        $fromLocked = $amount - $fromCoins;
+        q('UPDATE users SET coins = coins - ?, locked_coins = locked_coins - ? WHERE id = ?',
+          [$fromCoins, $fromLocked, $userId]);
+        $bal = (int) fetch_col('SELECT coins FROM users WHERE id = ?', [$userId], 0);
+        insert_row('coin_transactions', [
+            'user_id' => $userId, 'amount' => -$amount, 'balance' => $bal,
+            'type' => 'entry_fee', 'note' => 'Entry fee — ' . $gameSlug,
+        ]);
+        if ($ownTx) $pdo->commit();
+        return true;
+    } catch (Throwable $e) {
+        if ($ownTx && $pdo->inTransaction()) $pdo->rollBack();
+        throw $e;
+    }
+}
+
 /** Add XP and recompute level (250 XP per level). */
 function add_xp(int $userId, int $xp): void
 {

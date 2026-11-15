@@ -12,7 +12,7 @@
  * INSERT IGNORE, and so on), so a half-applied migration can simply be re-run.
  */
 
-const SCHEMA_VERSION = 7;
+const SCHEMA_VERSION = 8;
 
 /** version => migration file, relative to config/ */
 const SCHEMA_MIGRATIONS = [
@@ -28,6 +28,8 @@ const SCHEMA_MIGRATIONS = [
     6 => 'upgrade-v6.sql',
     // v7 — payments, game plans, subscriptions, registration fee, SEO manager.
     7 => 'upgrade-v7.sql',
+    // v8 — 3D Cube deposit gate + daily tournament.
+    8 => 'upgrade-v8.sql',
 ];
 
 /**
